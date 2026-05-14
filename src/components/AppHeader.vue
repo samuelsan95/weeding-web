@@ -139,6 +139,10 @@ function closeMenu() {
 }
 
 @media (max-width: 768px) {
+  .header-content {
+    justify-content: flex-start;
+  }
+
   .hamburger {
     display: flex;
   }

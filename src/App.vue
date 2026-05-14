@@ -1,6 +1,6 @@
 <script setup>
 import AppHeader from './components/AppHeader.vue'
-import HeroSection from './components/HeroSection.vue'
+import DateSection from './components/DateSection.vue'
 import LocationSection from './components/LocationSection.vue'
 import ScheduleSection from './components/ScheduleSection.vue'
 import ConfirmationForm from './components/ConfirmationForm.vue'
@@ -12,7 +12,7 @@ import FooterSection from './components/FooterSection.vue'
 <template>
   <AppHeader />
   <main>
-    <HeroSection />
+    <DateSection />
     <LocationSection />
     <ScheduleSection />
     <ConfirmationForm />

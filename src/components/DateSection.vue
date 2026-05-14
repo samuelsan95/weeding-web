@@ -88,7 +88,7 @@ onUnmounted(() => {
 }
 
 .hero-logo {
-  max-width: 180px;
+  max-width: 300px;
   height: auto;
   margin-bottom: 24px;
   animation: fadeScale 0.8s ease-out 0.1s both;
