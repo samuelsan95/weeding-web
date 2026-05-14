@@ -1,14 +1,22 @@
 <template>
   <section id="confirmation" class="section confirmation">
     <h2 class="section-title">Confirmar Asistencia</h2>
-    <form class="form" @submit.prevent="submitForm">
+    <form class="form" @submit.prevent="submitForm" novalidate>
       <div class="form-group">
-        <label for="name">Nombre y apellidos</label>
-        <input type="text" id="name" v-model="form.name" required />
+        <label for="conf-name">Nombre y apellidos</label>
+        <input
+          type="text"
+          id="conf-name"
+          v-model="form.name"
+          required
+          autocomplete="name"
+          aria-describedby="conf-name-hint"
+        />
+        <span id="conf-name-hint" class="visually-hidden">Introduce tu nombre completo</span>
       </div>
 
-      <div class="form-group">
-        <label>¿Asistirás?</label>
+      <fieldset class="form-group">
+        <legend class="form-legend">¿Asistirás?</legend>
         <div class="radio-group">
           <label class="radio-label">
             <input type="radio" v-model="form.attending" value="Sí" required />
@@ -19,21 +27,21 @@
             <span>No</span>
           </label>
         </div>
-      </div>
+      </fieldset>
 
-      <div class="form-group" v-if="form.attending === 'Sí'">
-        <label for="guests">Número de acompañantes</label>
-        <select id="guests" v-model="form.guests">
+      <fieldset class="form-group" v-if="form.attending === 'Sí'" :aria-live="'polite'">
+        <legend class="form-legend">Número de acompañantes</legend>
+        <select id="conf-guests" v-model="form.guests" aria-label="Número de acompañantes">
           <option value="0">0</option>
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4">4</option>
         </select>
-      </div>
+      </fieldset>
 
-      <div class="form-group" v-if="form.attending === 'Sí'">
-        <label>¿Habrá niños?</label>
+      <fieldset class="form-group" v-if="form.attending === 'Sí'">
+        <legend class="form-legend">¿Habrá niños?</legend>
         <div class="radio-group">
           <label class="radio-label">
             <input type="radio" v-model="form.children" value="Sí" />
@@ -44,25 +52,40 @@
             <span>No</span>
           </label>
         </div>
-      </div>
+      </fieldset>
 
       <div class="form-group" v-if="form.attending === 'Sí'">
-        <label for="allergies">Alergias o intolerancias</label>
-        <textarea id="allergies" v-model="form.allergies" rows="3" placeholder="Indica si tienes alguna alergia o intolerancia"></textarea>
+        <label for="conf-allergies">Alergias o intolerancias</label>
+        <textarea
+          id="conf-allergies"
+          v-model="form.allergies"
+          rows="3"
+          placeholder="Indica si tienes alguna alergia o intolerancia"
+          aria-describedby="conf-allergies-hint"
+        ></textarea>
+        <span id="conf-allergies-hint" class="visually-hidden">
+          Describe cualquier alergia o intolerancia alimentaria
+        </span>
       </div>
 
       <button type="submit" class="btn-submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
       </button>
 
-      <p v-if="message" class="form-message" :class="{ success: !error, error: error }">
+      <p
+        v-if="message"
+        class="form-message"
+        :class="{ success: !error, error: error }"
+        role="alert"
+        aria-live="assertive"
+      >
         {{ message }}
       </p>
     </form>
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 
 const form = reactive({
@@ -113,7 +136,7 @@ const submitForm = async () => {
   }
 }
 
-const resetForm = () => {
+function resetForm() {
   form.name = ''
   form.attending = ''
   form.guests = '0'
@@ -139,9 +162,32 @@ const resetForm = () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
-.form-group label {
+.form-legend {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.form-group label:not(.radio-label) {
   font-size: 0.9rem;
   color: var(--color-text);
   font-weight: 500;
@@ -156,11 +202,20 @@ const resetForm = () => {
   font-size: 1rem;
   font-family: inherit;
   background-color: var(--color-white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(94, 146, 134, 0.15);
 }
 
 .radio-group {
   display: flex;
-  gap: 20px;
+  gap: 24px;
 }
 
 .radio-label {
@@ -171,24 +226,30 @@ const resetForm = () => {
 }
 
 .radio-label input[type="radio"] {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   accent-color: var(--color-primary);
 }
 
 .btn-submit {
-  padding: 15px 30px;
+  padding: 14px 28px;
   background-color: var(--color-primary);
   color: var(--color-white);
   border: none;
   border-radius: 25px;
   font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .btn-submit:hover:not(:disabled) {
   opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .btn-submit:disabled {
@@ -198,7 +259,7 @@ const resetForm = () => {
 
 .form-message {
   text-align: center;
-  padding: 15px;
+  padding: 14px;
   border-radius: 8px;
 }
 

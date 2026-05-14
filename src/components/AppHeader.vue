@@ -1,13 +1,25 @@
 <template>
   <header class="header">
     <div class="header-content">
-      <button class="hamburger" :class="{ active: isOpen }" @click="toggleMenu" aria-label="Menú">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button
+        class="hamburger"
+        :class="{ active: isOpen }"
+        @click="toggleMenu"
+        :aria-expanded="isOpen"
+        aria-controls="main-nav"
+        aria-label="Menú de navegación"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
       </button>
-      <nav class="nav" :class="{ open: isOpen }">
-        <a v-for="item in menuItems" :key="item.href" :href="item.href" @click="closeMenu">
+      <nav id="main-nav" class="nav" :class="{ open: isOpen }" aria-label="Navegación principal">
+        <a
+          v-for="item in menuItems"
+          :key="item.href"
+          :href="item.href"
+          @click="closeMenu"
+        >
           {{ item.label }}
         </a>
       </nav>
@@ -15,7 +27,7 @@
   </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
 const isOpen = ref(false)
@@ -29,11 +41,11 @@ const menuItems = [
   { label: 'Fotos', href: '#photos' }
 ]
 
-const toggleMenu = () => {
+function toggleMenu() {
   isOpen.value = !isOpen.value
 }
 
-const closeMenu = () => {
+function closeMenu() {
   isOpen.value = false
 }
 </script>
@@ -64,15 +76,26 @@ const closeMenu = () => {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.hamburger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
 }
 
 .hamburger span {
-  width: 25px;
-  height: 3px;
+  width: 24px;
+  height: 2px;
   background-color: var(--color-white);
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .hamburger.active span:nth-child(1) {
@@ -84,23 +107,35 @@ const closeMenu = () => {
 }
 
 .hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
+  transform: rotate(-45deg) translate(5px, -5px);
 }
 
 .nav {
   display: flex;
-  gap: 30px;
+  gap: 32px;
 }
 
 .nav a {
   color: var(--color-white);
   text-decoration: none;
-  font-size: 1rem;
-  transition: opacity 0.3s;
+  font-size: 0.95rem;
+  transition: opacity 0.2s ease;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
 }
 
 .nav a:hover {
-  opacity: 0.8;
+  opacity: 0.85;
+}
+
+.nav a:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 4px;
+}
+
+.nav a:active {
+  border-bottom-color: var(--color-white);
 }
 
 @media (max-width: 768px) {
@@ -116,11 +151,11 @@ const closeMenu = () => {
     background-color: var(--color-primary);
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    gap: 20px;
+    padding: 24px 20px;
+    gap: 24px;
     transform: translateY(-100%);
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
     pointer-events: none;
   }
 
@@ -128,6 +163,10 @@ const closeMenu = () => {
     transform: translateY(0);
     opacity: 1;
     pointer-events: all;
+  }
+
+  .nav a {
+    font-size: 1.1rem;
   }
 }
 </style>

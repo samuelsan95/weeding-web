@@ -1,34 +1,60 @@
 <template>
   <section id="songs" class="section songs">
     <h2 class="section-title">Pide tu canción</h2>
-    <form class="form" @submit.prevent="submitForm">
+    <form class="form" @submit.prevent="submitForm" novalidate>
       <div class="form-group">
-        <label for="song">Canción que quieres escuchar</label>
-        <input type="text" id="song" v-model="form.song" required />
+        <label for="song-name">Canción que quieres escuchar</label>
+        <input
+          type="text"
+          id="song-name"
+          v-model="form.song"
+          required
+          aria-describedby="song-hint"
+        />
+        <span id="song-hint" class="visually-hidden">Escribe el título de la canción y el artista</span>
       </div>
 
       <div class="form-group">
-        <label for="dedication">Dedicatoria para los novios</label>
-        <textarea id="dedication" v-model="form.dedication" rows="3" required></textarea>
+        <label for="song-dedication">Dedicatoria para los novios</label>
+        <textarea
+          id="song-dedication"
+          v-model="form.dedication"
+          rows="3"
+          required
+          aria-describedby="dedication-hint"
+        ></textarea>
+        <span id="dedication-hint" class="visually-hidden">Escribe una dedicatoria especial para los novios</span>
       </div>
 
       <div class="form-group">
-        <label for="author">¿Quién lo escribe?</label>
-        <input type="text" id="author" v-model="form.author" required />
+        <label for="song-author">¿Quién lo escribe?</label>
+        <input
+          type="text"
+          id="song-author"
+          v-model="form.author"
+          required
+          autocomplete="name"
+        />
       </div>
 
       <button type="submit" class="btn-submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
       </button>
 
-      <p v-if="message" class="form-message" :class="{ success: !error, error: error }">
+      <p
+        v-if="message"
+        class="form-message"
+        :class="{ success: !error, error: error }"
+        role="alert"
+        aria-live="assertive"
+      >
         {{ message }}
       </p>
     </form>
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 
 const form = reactive({
@@ -41,7 +67,7 @@ const isSubmitting = ref(false)
 const message = ref('')
 const error = ref(false)
 
-const submitForm = async () => {
+async function submitForm() {
   isSubmitting.value = true
   message.value = ''
 
@@ -75,7 +101,7 @@ const submitForm = async () => {
   }
 }
 
-const resetForm = () => {
+function resetForm() {
   form.song = ''
   form.dedication = ''
   form.author = ''
@@ -101,6 +127,18 @@ const resetForm = () => {
   gap: 8px;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .form-group label {
   font-size: 0.9rem;
   color: var(--color-text);
@@ -115,21 +153,35 @@ const resetForm = () => {
   font-size: 1rem;
   font-family: inherit;
   background-color: var(--color-white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(94, 146, 134, 0.15);
 }
 
 .btn-submit {
-  padding: 15px 30px;
+  padding: 14px 28px;
   background-color: var(--color-primary);
   color: var(--color-white);
   border: none;
   border-radius: 25px;
   font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .btn-submit:hover:not(:disabled) {
   opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .btn-submit:disabled {
@@ -139,7 +191,7 @@ const resetForm = () => {
 
 .form-message {
   text-align: center;
-  padding: 15px;
+  padding: 14px;
   border-radius: 8px;
 }
 
