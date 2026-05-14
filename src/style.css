@@ -22,6 +22,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -31,22 +32,29 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#app {
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .section {
   padding: 80px 24px;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .section-title {
   font-family: 'Meow Script', cursive;
-  font-size: 50px;
-  font-weight: 600;
+  font-size: 40px;
+  font-weight: 400;
   color: var(--color-primary);
   text-align: center;
   margin-bottom: 48px;
   letter-spacing: 0.02em;
+  word-wrap: break-word;
 }
 
 ::selection {
@@ -71,6 +79,7 @@ body {
   }
 
   .section-title {
+    font-size: 36px;
     margin-bottom: 32px;
   }
 }
