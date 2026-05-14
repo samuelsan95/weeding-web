@@ -21,9 +21,3 @@ import FooterSection from './components/FooterSection.vue'
     <FooterSection />
   </main>
 </template>
-
-<style>
-main {
-  padding-top: 60px;
-}
-</style>

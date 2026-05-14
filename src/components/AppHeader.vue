@@ -33,7 +33,7 @@ import { ref } from 'vue'
 const isOpen = ref(false)
 
 const menuItems = [
-  { label: 'Nosotros', href: '#hero' },
+  { label: 'Nosotros', href: '#date' },
   { label: 'Dónde', href: '#location' },
   { label: 'Horario', href: '#schedule' },
   { label: 'Confirmar', href: '#confirmation' },
@@ -123,6 +123,7 @@ function closeMenu() {
   padding: 4px 0;
   border-bottom: 2px solid transparent;
   transition: opacity 0.2s ease, border-color 0.2s ease;
+  font-size: var(--font-size-medium);
 }
 
 .nav a:hover {

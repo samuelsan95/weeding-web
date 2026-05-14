@@ -7,20 +7,21 @@
         <h3>{{ location.name }}</h3>
         <p>{{ location.address }}</p>
         <a :href="location.mapsUrl" target="_blank" rel="noopener noreferrer" class="btn-maps">
-          Ver en Google Maps
+          <img src="../assets/map.svg" alt="" class="btn-icon" aria-hidden="true" />
+          Ver mapa
         </a>
       </div>
     </div>
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { location } from '../data/wedding.js'
 </script>
 
 <style scoped>
 .location {
-  background-color: var(--color-white);
+  background-color: var(--color-background);
 }
 
 .location-content {
@@ -34,7 +35,7 @@ import { location } from '../data/wedding.js'
   width: 100%;
   max-width: 600px;
   height: auto;
-  border-radius: 8px;
+  border-radius: 16px;
 }
 
 .location-info {
@@ -42,29 +43,40 @@ import { location } from '../data/wedding.js'
 }
 
 .location-info h3 {
-  font-size: 1.5rem;
+  font-size: var(--font-size-large);
   color: var(--color-primary);
   margin-bottom: 10px;
   font-weight: normal;
 }
 
 .location-info p {
-  font-size: 1rem;
+  font-size: var(--font-size-small);
   margin-bottom: 20px;
   color: var(--color-text);
+  white-space: pre-line;
+  text-align: center;
 }
 
 .btn-maps {
-  display: inline-block;
-  padding: 12px 30px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
   text-decoration: none;
   border-radius: 25px;
-  transition: opacity 0.3s;
+  font-size: var(--font-size-small);
+  font-weight: 600;
 }
 
 .btn-maps:hover {
   opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-maps:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 </style>

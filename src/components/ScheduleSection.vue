@@ -1,16 +1,19 @@
 <template>
   <section id="schedule" class="section schedule">
-    <h2 class="section-title">Horario</h2>
-    <div class="schedule-list">
+    <div class="schedule-header">
+      <h2 class="section-title">Horarios</h2>
+      <div class="title-flourish"></div>
+    </div>
+
+    <div class="schedule-timeline">
       <div
         v-for="(item, index) in schedule"
         :key="item.event"
         class="schedule-item"
-        :style="{ animationDelay: `${index * 0.1}s` }"
       >
-        <div class="schedule-time">{{ item.time }}</div>
-        <div class="schedule-divider"></div>
-        <div class="schedule-event">{{ item.event }}</div>
+        <span class="schedule-label">{{ item.event }}</span>
+        <span class="schedule-time">{{ item.time }}h</span>
+        <div v-if="index < schedule.length - 1" class="schedule-line"></div>
       </div>
     </div>
   </section>
@@ -23,85 +26,76 @@ import { schedule } from '../data/wedding.js'
 <style scoped>
 .schedule {
   background-color: var(--color-background);
-  position: relative;
-  overflow: hidden;
 }
 
-.schedule::before {
+.schedule-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-family: 'Meow Script', cursive;
+  font-size: var(--font-size-xx-large);
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.title-flourish {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  margin: 0 auto;
+  position: relative;
+}
+
+.title-flourish::before {
   content: '';
   position: absolute;
-  top: 0;
   left: 50%;
-  transform: translateX(-50%);
-  width: 200%;
-  height: 100%;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(94, 146, 134, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(196, 167, 125, 0.06) 0%, transparent 50%);
-  pointer-events: none;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
 }
 
-.schedule-list {
-  max-width: 420px;
-  margin: 0 auto;
+.schedule-timeline {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  position: relative;
-  z-index: 1;
+  align-items: center;
+  gap: 0;
 }
 
 .schedule-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 20px 24px;
-  background: var(--color-white);
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeSlideUp 0.5s ease-out forwards;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
 }
 
-.schedule-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+.schedule-label {
+  font-size: var(--font-size-large);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: 'Cormorant Garamond', serif;
 }
 
 .schedule-time {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: var(--font-size-medium);
+  font-weight: 400;
   color: var(--color-primary);
-  min-width: 60px;
   font-family: 'DM Serif Display', serif;
+  margin-bottom: 16px;
 }
 
-.schedule-divider {
-  width: 1px;
+.schedule-line {
+  width: 2px;
   height: 40px;
-  background: linear-gradient(180deg, transparent, var(--color-border), transparent);
+  background-color: var(--color-primary-light);
 }
 
-.schedule-event {
-  font-size: 1rem;
-  color: var(--color-text);
-  flex: 1;
-}
-
-@keyframes fadeSlideUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .schedule-item {
-    opacity: 1;
-    transform: none;
-    animation: none;
-  }
+.schedule-item:last-child .schedule-line {
+  display: none;
 }
 </style>

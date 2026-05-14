@@ -1,17 +1,21 @@
 <template>
-  <section id="hero" class="hero">
-    <div class="hero-bg-pattern"></div>
-    <div class="hero-content">
-      <img src="../assets/logo.png" alt="Logo de la boda" class="hero-logo" />
-      <p class="hero-date">26 de Junio de 2027</p>
-      <div class="countdown">
-        <div class="countdown-item" v-for="unit in countdownUnits" :key="unit.label">
-          <span class="countdown-value">{{ unit.value }}</span>
-          <span class="countdown-label">{{ unit.label }}</span>
+  <section id="date" class="date">
+    <div class="date-content">
+      <img src="../assets/logo.png" alt="Logo de la boda" class="date-logo" />
+      <p class="date-date">26 de Junio de 2027</p>
+      <div class="date-welcome">
+        <div class="welcome">
+          <h2 class="section-title">¡Nos vamos a casar!</h2>
+          <p class="welcome-text">Y queremos compartir este día tan especial junto a las personas que más queremos.</p>
+        </div>
+        <div class="countdown">
+          <div class="countdown-item" v-for="unit in countdownUnits" :key="unit.label">
+            <span class="countdown-value">{{ unit.value }}</span>
+            <span class="countdown-label">{{ unit.label }}</span>
         </div>
       </div>
+      </div>
     </div>
-    <div class="hero-decoration"></div>
   </section>
 </template>
 
@@ -60,7 +64,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.hero {
+.date {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -71,36 +75,48 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.hero-bg-pattern {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 20% 30%, rgba(94, 146, 134, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 70%, rgba(196, 167, 125, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(94, 146, 134, 0.05) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-content {
+.date-content {
   text-align: center;
   position: relative;
   z-index: 1;
 }
 
-.hero-logo {
+.date-logo {
   max-width: 300px;
   height: auto;
-  margin-bottom: 24px;
   animation: fadeScale 0.8s ease-out 0.1s both;
 }
 
-.hero-date {
-  font-size: 1.4rem;
+.date-date {
+  font-size: var(--font-size-large);
   color: var(--color-primary);
   margin-bottom: 48px;
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
   animation: fadeSlideUp 0.6s ease-out 0.2s both;
+}
+
+.date-welcome {
+  background-color: var(--color-primary-light);
+  padding: 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.welcome {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.welcome > .section-title {
+  margin-bottom: 0;
+}
+
+.welcome-text {
+  font-size: var(--font-size-medium);
+  color: var(--color-primary);
 }
 
 .countdown {
@@ -116,9 +132,9 @@ onUnmounted(() => {
   align-items: center;
   min-width: 72px;
   padding: 16px 12px;
-  background: var(--color-white);
+  /* background: var(--color-white); */
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(94, 146, 134, 0.12);
+  /* box-shadow: 0 4px 20px rgba(94, 146, 134, 0.12); */
   animation: fadeSlideUp 0.5s ease-out both;
 }
 
@@ -128,33 +144,19 @@ onUnmounted(() => {
 .countdown-item:nth-child(4) { animation-delay: 0.6s; }
 
 .countdown-value {
-  font-size: 2.5rem;
+  font-size: var(--font-size-x-large);
   font-weight: 700;
   color: var(--color-primary);
   line-height: 1;
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Meow Script', cursive;
   letter-spacing: -0.02em;
 }
 
 .countdown-label {
-  font-size: 0.75rem;
-  color: var(--color-text);
-  margin-top: 8px;
+  font-size: var(--font-size-small);
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-}
-
-.hero-decoration {
-  position: absolute;
-  bottom: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  height: 100px;
-  background: var(--color-primary);
-  border-radius: 50% 50% 0 0;
-  opacity: 0.05;
-  pointer-events: none;
 }
 
 @keyframes fadeScale {
@@ -179,9 +181,34 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .date {
+    padding: 70px 16px 40px;
+  }
+
+  .date-content {
+    width: 100%;
+  }
+
+  .date-date {
+    margin-bottom: 32px;
+  }
+
+  .date-welcome {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 20px;
+    border-radius: 0;
+  }
+
+  .welcome {
+    margin-bottom: 32px;
+  }
+
   .countdown {
     gap: 12px;
+    flex-wrap: nowrap;
   }
 
   .countdown-item {
@@ -190,13 +217,13 @@ onUnmounted(() => {
   }
 
   .countdown-value {
-    font-size: 1.8rem;
+    font-size: var(--font-size-large);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-logo,
-  .hero-date,
+  .date-logo,
+  .date-date,
   .countdown-item {
     animation: none;
     opacity: 1;

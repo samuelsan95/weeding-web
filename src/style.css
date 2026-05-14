@@ -2,6 +2,7 @@
 
 :root {
   --color-primary: #5E9286;
+  --color-primary-light: #C8D5C6;
   --color-secondary: #C4A77D;
   --color-background: #F8F5F0;
   --color-white: #FFFFFF;
@@ -12,6 +13,12 @@
   --color-success-bg: #D4EDDA;
   --color-error: #8B3A3A;
   --color-error-bg: #F8D7DA;
+
+  --font-size-small: 1.2rem;
+  --font-size-medium: 1.5rem;
+  --font-size-large: 2rem;
+  --font-size-x-large: 2.5rem;
+  --font-size-xx-large: 3rem;
 }
 
 * {
@@ -41,14 +48,14 @@ body {
 }
 
 .section {
-  padding: 80px 24px;
+  padding: 40px 24px;
   max-width: 100%;
   margin: 0 auto;
 }
 
 .section-title {
   font-family: 'Meow Script', cursive;
-  font-size: 40px;
+  font-size: var(--font-size-xx-large);
   font-weight: 600;
   color: var(--color-primary);
   text-align: center;
@@ -75,11 +82,11 @@ body {
 
 @media (max-width: 768px) {
   .section {
-    padding: 60px 16px;
+    padding: 20px 16px;
   }
 
   .section-title {
-    font-size: 36px;
+    font-size: var(--font-size-x-large);
     margin-bottom: 32px;
   }
 }

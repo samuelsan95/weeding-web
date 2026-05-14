@@ -2,40 +2,27 @@
   <section id="songs" class="section songs">
     <h2 class="section-title">Pide tu canción</h2>
     <form class="form" @submit.prevent="submitForm" novalidate>
-      <div class="form-group">
-        <label for="song-name">Canción que quieres escuchar</label>
-        <input
-          type="text"
-          id="song-name"
-          v-model="form.song"
-          required
-          aria-describedby="song-hint"
-        />
-        <span id="song-hint" class="visually-hidden">Escribe el título de la canción y el artista</span>
-      </div>
+      <FormInput
+        v-model="form.song"
+        label="Canción que quieres escuchar"
+        required
+        hint="Escribe el título de la canción y el artista"
+      />
 
-      <div class="form-group">
-        <label for="song-dedication">Dedicatoria para los novios</label>
-        <textarea
-          id="song-dedication"
-          v-model="form.dedication"
-          rows="3"
-          required
-          aria-describedby="dedication-hint"
-        ></textarea>
-        <span id="dedication-hint" class="visually-hidden">Escribe una dedicatoria especial para los novios</span>
-      </div>
+      <FormInput
+        v-model="form.dedication"
+        type="textarea"
+        label="Dedicatoria para los novios"
+        required
+        hint="Escribe una dedicatoria especial para los novios"
+      />
 
-      <div class="form-group">
-        <label for="song-author">¿Quién lo escribe?</label>
-        <input
-          type="text"
-          id="song-author"
-          v-model="form.author"
-          required
-          autocomplete="name"
-        />
-      </div>
+      <FormInput
+        v-model="form.author"
+        label="¿Quién lo escribe?"
+        required
+        autocomplete="name"
+      />
 
       <button type="submit" class="btn-submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
@@ -56,6 +43,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import FormInput from './FormInput.vue'
 
 const form = reactive({
   song: '',
@@ -119,48 +107,9 @@ function resetForm() {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  color: var(--color-text);
-  font-weight: 500;
-}
-
-.form-group input[type="text"],
-.form-group textarea {
-  padding: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 1rem;
-  font-family: inherit;
   background-color: var(--color-white);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-group input[type="text"]:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(94, 146, 134, 0.15);
+  padding: 24px;
+  border-radius: 16px;
 }
 
 .btn-submit {

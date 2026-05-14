@@ -18,6 +18,6 @@ export const photos = [
 
 export const location = {
   name: 'Finca Los Rosales de Cubas',
-  address: 'Calle Cam. de Madrid, s/n, 28978 Cubas de la Sagra, Madrid',
+  address: 'Calle Cam. de Madrid, s/n, 28978 \n Cubas de la Sagra, Madrid',
   mapsUrl: 'https://www.google.com/maps/search/Finca+Los+Rosales+de+Cubas+Madrid'
 }

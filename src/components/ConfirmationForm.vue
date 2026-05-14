@@ -2,18 +2,13 @@
   <section id="confirmation" class="section confirmation">
     <h2 class="section-title">Confirmar Asistencia</h2>
     <form class="form" @submit.prevent="submitForm" novalidate>
-      <div class="form-group">
-        <label for="conf-name">Nombre y apellidos</label>
-        <input
-          type="text"
-          id="conf-name"
-          v-model="form.name"
-          required
-          autocomplete="name"
-          aria-describedby="conf-name-hint"
-        />
-        <span id="conf-name-hint" class="visually-hidden">Introduce tu nombre completo</span>
-      </div>
+      <FormInput
+        v-model="form.name"
+        label="Tú nombre completo"
+        required
+        autocomplete="name"
+        hint="Introduce tu nombre completo"
+      />
 
       <fieldset class="form-group">
         <legend class="form-legend">¿Asistirás?</legend>
@@ -54,19 +49,14 @@
         </div>
       </fieldset>
 
-      <div class="form-group" v-if="form.attending === 'Sí'">
-        <label for="conf-allergies">Alergias o intolerancias</label>
-        <textarea
-          id="conf-allergies"
-          v-model="form.allergies"
-          rows="3"
-          placeholder="Indica si tienes alguna alergia o intolerancia"
-          aria-describedby="conf-allergies-hint"
-        ></textarea>
-        <span id="conf-allergies-hint" class="visually-hidden">
-          Describe cualquier alergia o intolerancia alimentaria
-        </span>
-      </div>
+      <FormInput
+        v-if="form.attending === 'Sí'"
+        v-model="form.allergies"
+        type="textarea"
+        label="Alergias o intolerancias"
+        placeholder="Indica si tienes alguna alergia o intolerancia"
+        hint="Describe cualquier alergia o intolerancia alimentaria"
+      />
 
       <button type="submit" class="btn-submit" :disabled="isSubmitting">
         {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
@@ -87,6 +77,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import FormInput from './FormInput.vue'
 
 const form = reactive({
   name: '',
@@ -147,11 +138,14 @@ function resetForm() {
 
 <style scoped>
 .confirmation {
-  background-color: var(--color-white);
+  background-color: var(--color-background);
 }
 
 .form {
+  background-color: var(--color-white);
   max-width: 500px;
+  padding: 24px;
+  border-radius: 16px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
