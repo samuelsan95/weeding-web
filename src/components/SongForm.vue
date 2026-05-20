@@ -4,7 +4,7 @@
     <form class="form" @submit.prevent="submitForm" novalidate>
       <FormInput
         v-model="form.song"
-        label="Canción que quieres escuchar"
+        label="Canción que quieres escuchar *"
         required
         hint="Escribe el título de la canción y el artista"
       />
@@ -56,6 +56,12 @@ const message = ref('')
 const error = ref(false)
 
 async function submitForm() {
+  if (!form.song.trim()) {
+    message.value = 'Por favor, indica la canción que quieres solicitar.'
+    error.value = true
+    return
+  }
+
   isSubmitting.value = true
   message.value = ''
 
@@ -63,14 +69,17 @@ async function submitForm() {
     const timestamp = new Date().toISOString()
     const data = {
       Timestamp: timestamp,
-      'Canción': form.song,
+      'Cancion': form.song,
       'Dedicatoria': form.dedication,
-      'Autor': form.author
+      'Quien': form.author
     }
 
-    const response = await fetch('https://sheet.best/api/sheets/YOUR_SHEET_ID_HERE', {
+    const response = await fetch(import.meta.env.VITE_SONG_SHEET_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': import.meta.env.VITE_SONG_API_KEY
+      },
       body: JSON.stringify(data)
     })
 

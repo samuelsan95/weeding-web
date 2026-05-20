@@ -7,6 +7,7 @@ import ConfirmationForm from './components/ConfirmationForm.vue'
 import SongForm from './components/SongForm.vue'
 import PhotosCarousel from './components/PhotosCarousel.vue'
 import FooterSection from './components/FooterSection.vue'
+import SeparateSection from './components/SeparateSection.vue'
 </script>
 
 <template>
@@ -14,6 +15,7 @@ import FooterSection from './components/FooterSection.vue'
   <main>
     <DateSection />
     <LocationSection />
+    <SeparateSection />
     <ScheduleSection />
     <ConfirmationForm />
     <SongForm />

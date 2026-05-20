@@ -71,7 +71,7 @@ function next() {
 
 <style scoped>
 .photos {
-  background-color: var(--color-white);
+  background-color: var(--color-background);
 }
 
 .carousel {

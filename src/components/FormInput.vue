@@ -12,6 +12,18 @@
       @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
     ></textarea>
     <input
+      v-else-if="type === 'number'"
+      type="number"
+      :id="inputId"
+      :value="modelValue"
+      :placeholder="placeholder"
+      :required="required"
+      :min="min"
+      :step="step"
+      :aria-describedby="hintId"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+    />
+    <input
       v-else
       :type="type"
       :id="inputId"
@@ -32,16 +44,19 @@ import { computed } from 'vue'
 const props = withDefaults(defineProps<{
   modelValue: string
   label: string
-  type?: 'text' | 'textarea'
+  type?: 'text' | 'number' | 'textarea'
   placeholder?: string
   required?: boolean
   autocomplete?: string
   hint?: string
+  min?: number
+  step?: number
 }>(), {
   type: 'text',
   placeholder: '',
   required: false,
-  autocomplete: 'off'
+  autocomplete: 'off',
+  min: 0
 })
 
 defineEmits<{
@@ -60,8 +75,8 @@ const hintId = computed(() => `${inputId.value}-hint`)
 }
 
 .form-group label {
-  font-size: 0.9rem;
-  color: var(--color-text);
+  font-size: var(--font-size-medium);
+  color: var(--color-primary);
   font-weight: 500;
 }
 
@@ -70,7 +85,7 @@ const hintId = computed(() => `${inputId.value}-hint`)
   padding: 12px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: var(--font-size-small);
   font-family: inherit;
   background-color: var(--color-white);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;

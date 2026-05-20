@@ -1,15 +1,15 @@
 <template>
   <section id="footer" class="section footer">
     <div class="footer-content">
-      <img src="../assets/logo.png" alt="Logo de la boda" class="footer-logo" />
-      <h2 class="footer-text">¡Te esperamos con muchas ganas!</h2>
+      <h2 class="section-title">¡Te esperamos con muchas ganas!</h2>
+      <img src="../assets/finca.png" alt="Logo de la boda" class="footer-logo" />
     </div>
   </section>
 </template>
 
 <style scoped>
 .footer {
-  background-color: var(--color-primary);
+  background-color: var(--color-background);
   color: var(--color-white);
 }
 
@@ -20,14 +20,10 @@
   gap: 30px;
 }
 
-.illustration {
-  width: 150px;
-  height: 150px;
-}
-
-.footer-text {
-  font-size: 1.5rem;
-  font-weight: normal;
-  text-align: center;
+.footer-logo {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 16px;
 }
 </style>

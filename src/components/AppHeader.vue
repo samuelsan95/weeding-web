@@ -65,7 +65,7 @@ function closeMenu() {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
 }
 
