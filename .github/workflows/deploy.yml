@@ -18,6 +18,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: Sheet
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,6 +32,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Debug - Show environment variables (masked)
+        run: |
+          echo "VITE_CONFIRMATION_SHEET_URL: $VITE_CONFIRMATION_SHEET_URL"
+          echo "VITE_CONFIRMATION_API_KEY: ${VITE_CONFIRMATION_API_KEY:0:4}..."
+          echo "VITE_SONG_SHEET_URL: $VITE_SONG_SHEET_URL"
+          echo "VITE_SONG_API_KEY: ${VITE_SONG_API_KEY:0:4}..."
 
       - name: Build
         run: npm run build
