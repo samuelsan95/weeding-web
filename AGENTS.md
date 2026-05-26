@@ -48,3 +48,23 @@ Push to `main` triggers GitHub Actions workflow (`.github/workflows/deploy.yml`)
 - UI text is in Spanish
 - CSS variables defined in `:root` of `style.css`, consumed via `var(--color-*)` in components
 - Assets imported via `new URL(..., import.meta.url)` in `wedding.js` (Vite asset handling)
+
+## Footprint Animation Config (`src/composables/useFootprintAnimation.ts`)
+
+Top-level constants control the scroll-driven footprint effect:
+
+| Constant | Default | Effect |
+|---|---|---|
+| `SCROLL_THRESHOLD` | `80` | px of scroll between each footprint. Higher = more spaced out. |
+| `LATERAL_OFFSET` | `35` | px each foot deviates from the path center line (left/right separation). |
+| `FADE_SPEED` | `0.002` | opacity lost per animation frame. Lower = slower fade. |
+| `INITIAL_OPACITY` | `0.85` | starting opacity of a new footprint. |
+| `FOOTPRINT_WIDTH` / `FOOTPRINT_HEIGHT` | `64` / `80` | draw dimensions in px. |
+
+**Path shape** — defined in `buildPath()` as 6 cubic Bézier segments. Each segment has 4 points (`p0`–`p3`):
+- `x` is a fraction of viewport width (`vw * 0.25` = 25% from left).
+- `y` is a fraction of total document height (`docHeight * 0.50` = middle of page).
+- `p0` of segment N must equal `p3` of segment N-1 for continuity.
+- `p1` and `p2` are control points that shape the curve.
+
+**Layering**: canvas `z-index: 50`, sections `z-index: 101` (in `style.css`). Footprints render behind all content.

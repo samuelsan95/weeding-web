@@ -10,8 +10,8 @@ const FOOTPRINT_WIDTH = 64
 const FOOTPRINT_HEIGHT = 80
 const ARC_SAMPLES_PER_SEGMENT = 40
 
-const LEFT_FOOTPRINT_PATH = '/src/assets/left-foot.png'
-const RIGHT_FOOTPRINT_PATH = '/src/assets/right-foot.png'
+const LEFT_FOOTPRINT_PATH = new URL('../assets/left-foot.png', import.meta.url).href
+const RIGHT_FOOTPRINT_PATH = new URL('../assets/right-foot.png', import.meta.url).href
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
