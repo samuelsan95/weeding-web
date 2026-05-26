@@ -51,6 +51,8 @@ body {
   padding: 40px 24px;
   max-width: 100%;
   margin: 0 auto;
+  position: relative;
+  z-index: 101;
 }
 
 .section-title {
