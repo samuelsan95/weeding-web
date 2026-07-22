@@ -2,10 +2,23 @@
   <section id="footer" class="section footer">
     <div class="footer-content">
       <h2 class="section-title">¡Te esperamos con muchas ganas!</h2>
-      <img src="../assets/finca.png" alt="Logo de la boda" class="footer-logo" />
+      <div class="footer-video-wrapper">
+        <video
+          :src="videoSrc"
+          autoplay
+          loop
+          muted
+          playsinline
+          class="footer-video footer-video--fg"
+        ></video>
+      </div>
     </div>
   </section>
 </template>
+
+<script setup>
+import videoSrc from '../assets/video.mp4'
+</script>
 
 <style scoped>
 .footer {
@@ -20,10 +33,18 @@
   gap: 30px;
 }
 
-.footer-logo {
+.footer-video-wrapper {
+  position: relative;
   width: 100%;
   max-width: 600px;
-  height: auto;
   border-radius: 16px;
+  overflow: hidden;
+}
+
+.footer-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
 }
 </style>

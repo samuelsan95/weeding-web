@@ -31,10 +31,10 @@ const { canvas, isReady } = useFootprintAnimation()
   pointer-events: none;
   z-index: 102;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .footprint-canvas.ready {
-  opacity: 1;
+  opacity: 0.7;
 }
 </style>

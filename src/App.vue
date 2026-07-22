@@ -12,7 +12,6 @@ import FootprintCanvas from './components/FootprintCanvas.vue'
 </script>
 
 <template>
-  <FootprintCanvas />
   <AppHeader />
   <main>
     <DateSection />

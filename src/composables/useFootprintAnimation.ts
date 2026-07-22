@@ -104,8 +104,10 @@ function segmentTotalLength(table: ArcLengthEntry[]): number {
 // X is relative to viewport width, Y is relative to document scroll height.
 
 function buildPath(vw: number, docHeight: number): { segments: CubicBezierSegment[]; tables: ArcLengthEntry[][]; totalLength: number } {
-  const xMin = vw < 768 ? vw * 0.15 : vw * 0.25
-  const xMax = vw < 768 ? vw * 0.85 : vw * 0.75
+  // Constrain path X so footprints stay within the content area of sections.
+  // Desktop: 30%-70% of viewport. Mobile: 20%-80%.
+  const xMin = vw < 768 ? vw * 0.20 : vw * 0.30
+  const xMax = vw < 768 ? vw * 0.80 : vw * 0.70
   const xMid = (xMin + xMax) / 2
   const xRange = xMax - xMin
 
