@@ -2,11 +2,11 @@
   <section id="date" class="date">
     <div class="date-content">
       <img src="../assets/logo.png" alt="Logo de la boda" class="date-logo" />
-      <p class="date-date">26 de Junio de 2027</p>
       <div class="date-welcome">
         <div class="welcome">
           <h2 class="section-title">¡Nos vamos a casar!</h2>
           <p class="welcome-text">Y queremos compartir este día tan especial junto a las personas que más queremos.</p>
+          <p class="date-date">26 de Junio de 2027</p>
         </div>
         <div class="countdown">
           <div class="countdown-item" v-for="unit in countdownUnits" :key="unit.label">
@@ -88,7 +88,7 @@ onUnmounted(() => {
 }
 
 .date-date {
-  font-size: var(--font-size-large);
+  font-size: var(--font-size-x-large);
   color: var(--color-primary);
   margin-bottom: 48px;
   font-family: 'Cormorant Garamond', serif;
@@ -115,7 +115,7 @@ onUnmounted(() => {
 }
 
 .welcome-text {
-  font-size: var(--font-size-medium);
+  font-size: var(--font-size-large);
   color: var(--color-primary);
 }
 
@@ -153,7 +153,7 @@ onUnmounted(() => {
 }
 
 .countdown-label {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-x-small);
   color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.1em;

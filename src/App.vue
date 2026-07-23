@@ -8,10 +8,11 @@ import SongForm from './components/SongForm.vue'
 import PhotosCarousel from './components/PhotosCarousel.vue'
 import FooterSection from './components/FooterSection.vue'
 import SeparateSection from './components/SeparateSection.vue'
-import FootprintCanvas from './components/FootprintCanvas.vue'
+import VideoIntro from './components/VideoIntro.vue'
 </script>
 
 <template>
+  <VideoIntro />
   <AppHeader />
   <main>
     <DateSection />
