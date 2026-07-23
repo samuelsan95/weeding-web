@@ -1,6 +1,8 @@
 <template>
-  <section id="photos" class="section photos">
+  <section id="photos" class="section section--accent photos">
+    <span class="section-eyebrow">Momentos</span>
     <h2 class="section-title">Nuestros Recuerdos</h2>
+    <div class="section-divider"></div>
     <div class="carousel" role="region" aria-label="Galería de fotos">
       <button
         class="carousel-btn prev"

@@ -8,7 +8,7 @@
       <div class="video-intro__media">
         <video
           class="video-intro__video"
-          :src="videoUrl"
+          :poster="posterUrl"
           autoplay
           muted
           playsinline
@@ -16,7 +16,10 @@
           @ended="onEnded"
           @canplay="onCanPlay"
           @error="onError"
-        />
+        >
+          <source :src="videoWebm" type="video/webm" />
+          <source :src="videoMp4" type="video/mp4" />
+        </video>
         <div class="video-intro__vignette" />
       </div>
 
@@ -46,7 +49,9 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import videoUrl from '../assets/video.mp4'
+import videoWebm from '../assets/intro/intro.webm'
+import videoMp4 from '../assets/intro/intro.mp4'
+import posterUrl from '../assets/intro/poster.jpg'
 import logoUrl from '../assets/logo.png'
 
 const SESSION_KEY = 'wedding-intro-seen'

@@ -1,6 +1,8 @@
 <template>
-  <section id="confirmation" class="section confirmation">
+  <section id="confirmation" class="section section--card confirmation">
+    <span class="section-eyebrow">¿Vendrás?</span>
     <h2 class="section-title">Confirmar Asistencia</h2>
+    <div class="section-divider"></div>
     <form class="form" @submit.prevent="submitForm" novalidate>
       <FormInput
         v-model="form.name"

@@ -1,6 +1,7 @@
 <template>
-  <section id="schedule" class="section schedule">
+  <section id="schedule" class="section section--tall schedule">
     <div class="schedule-header">
+      <span class="section-eyebrow">El gran día</span>
       <h2 class="section-title">Horarios</h2>
       <div class="title-flourish"></div>
     </div>

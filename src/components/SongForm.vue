@@ -1,6 +1,8 @@
 <template>
-  <section id="songs" class="section songs">
+  <section id="songs" class="section section--flush songs">
+    <span class="section-eyebrow">Bailemos</span>
     <h2 class="section-title">Pide tu canción</h2>
+    <div class="section-divider"></div>
     <form class="form" @submit.prevent="submitForm" novalidate>
       <FormInput
         v-model="form.song"
@@ -13,15 +15,14 @@
         v-model="form.dedication"
         type="textarea"
         label="Dedicatoria para los novios"
-        required
-        hint="Escribe una dedicatoria especial para los novios"
+        hint="Escribe una dedicatoria especial para los novios (opcional)"
       />
 
       <FormInput
         v-model="form.author"
         label="¿Quién lo escribe?"
-        required
         autocomplete="name"
+        hint="Déjalo vacío si quieres que sea anónimo"
       />
 
       <button type="submit" class="btn-submit" :disabled="isSubmitting">
