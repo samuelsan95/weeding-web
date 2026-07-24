@@ -5,7 +5,7 @@ import LocationSection from './components/LocationSection.vue'
 import ScheduleSection from './components/ScheduleSection.vue'
 import ConfirmationForm from './components/ConfirmationForm.vue'
 import SongForm from './components/SongForm.vue'
-import PhotosCarousel from './components/PhotosCarousel.vue'
+import PhotosGallery from './components/PhotosGallery.vue'
 import FooterSection from './components/FooterSection.vue'
 import SeparateSection from './components/SeparateSection.vue'
 import VideoIntro from './components/VideoIntro.vue'
@@ -21,7 +21,7 @@ import VideoIntro from './components/VideoIntro.vue'
     <ScheduleSection />
     <ConfirmationForm />
     <SongForm />
-    <PhotosCarousel />
+    <PhotosGallery />
     <FooterSection />
   </main>
 </template>

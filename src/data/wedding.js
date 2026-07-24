@@ -13,7 +13,15 @@ const fincaUrl = new URL('../assets/finca.png', import.meta.url).href
 
 export const photos = [
   { id: 1, src: logoUrl, alt: 'Nuestra boda' },
-  { id: 2, src: fincaUrl, alt: 'La finca' }
+  { id: 2, src: fincaUrl, alt: 'La finca' },
+  { id: 3, src: fincaUrl, alt: 'La finca' },
+  { id: 4, src: fincaUrl, alt: 'La finca' },
+  { id: 5, src: fincaUrl, alt: 'La finca' },
+  { id: 6, src: fincaUrl, alt: 'La finca' },
+  { id: 7, src: fincaUrl, alt: 'La finca' },
+  { id: 8, src: fincaUrl, alt: 'La finca' },
+  { id: 9, src: fincaUrl, alt: 'La finca' },
+  { id: 10, src: fincaUrl, alt: 'La finca' }
 ]
 
 export const location = {
