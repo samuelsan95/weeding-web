@@ -17,15 +17,17 @@
           @canplay="onCanPlay"
           @error="onError"
         >
-          <source :src="videoWebm" type="video/webm" />
-          <source :src="videoMp4" type="video/mp4" />
+          <source media="(max-width: 768px)" :src="videoMovilWebm" type="video/webm" />
+          <source media="(max-width: 768px)" :src="videoMovilMp4" type="video/mp4" />
+          <source :src="videoDesktopWebm" type="video/webm" />
+          <source :src="videoDesktopMp4" type="video/mp4" />
         </video>
         <div class="video-intro__vignette" />
       </div>
 
       <div class="video-intro__overlay">
         <div class="video-intro__content" :class="{ 'is-visible': showText }">
-          <p class="video-intro__eyebrow">Nos casamos</p>
+          <p class="video-intro__eyebrow">¡Nos casamos!</p>
           <img
             class="video-intro__logo"
             :src="logoUrl"
@@ -49,10 +51,16 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import videoWebm from '../assets/intro/intro.webm'
-import videoMp4 from '../assets/intro/intro.mp4'
-import posterUrl from '../assets/intro/poster.jpg'
-import logoUrl from '../assets/logo.png'
+import videoDesktopWebm from '../assets/intro/video_desktop.webm'
+import videoDesktopMp4 from '../assets/intro/video_desktop.mp4'
+import videoMovilWebm from '../assets/intro/video_movil.webm'
+import videoMovilMp4 from '../assets/intro/video_movil.mp4'
+import posterDesktopUrl from '../assets/intro/poster_desktop.jpg'
+import posterMovilUrl from '../assets/intro/poster_movil.jpg'
+import logoUrl from '../assets/logo_white.png'
+
+const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+const posterUrl = isMobile ? posterMovilUrl : posterDesktopUrl
 
 const SESSION_KEY = 'wedding-intro-seen'
 const MAX_DURATION = 6000
@@ -198,7 +206,7 @@ function handleSkip(e) {
 
 .video-intro__eyebrow {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-large);
   font-style: italic;
   font-weight: 400;
   letter-spacing: 0.35em;
@@ -223,7 +231,7 @@ function handleSkip(e) {
 
 .video-intro__date {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: var(--font-size-large);
+  font-size: var(--font-size-xx-large);
   font-weight: 500;
   letter-spacing: 0.5em;
   margin-top: 28px;
@@ -291,7 +299,7 @@ function handleSkip(e) {
 
 @media (max-width: 768px) {
   .video-intro__eyebrow {
-    font-size: var(--font-size-x-small);
+    font-size: var(--font-size-small);
     letter-spacing: 0.28em;
     margin-bottom: 18px;
   }
@@ -301,7 +309,7 @@ function handleSkip(e) {
   }
 
   .video-intro__date {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-large);
     letter-spacing: 0.4em;
     margin-top: 22px;
   }
