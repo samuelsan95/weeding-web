@@ -90,9 +90,10 @@ onUnmounted(() => {
 .date-date {
   font-size: var(--font-size-x-large);
   color: var(--color-primary);
+  margin-top: 48px;
   margin-bottom: 48px;
   font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
+  font-weight: 700;
   animation: fadeSlideUp 0.6s ease-out 0.2s both;
 }
 
