@@ -1,15 +1,38 @@
 <template>
   <section id="songs" class="section section--flush songs">
     <span class="section-eyebrow">Bailemos</span>
-    <h2 class="section-title">Pide tu canción</h2>
+    <h2 class="section-title">Pide tus canciones</h2>
     <div class="section-divider"></div>
+
     <form class="form" @submit.prevent="submitForm" novalidate>
-      <FormInput
-        v-model="form.song"
-        label="Canción que quieres escuchar *"
-        required
-        hint="Escribe el título de la canción y el artista"
-      />
+      <div class="slots">
+        <SongPicker
+          v-for="(slot, i) in slots"
+          :key="slot.id"
+          ref="pickerRefs"
+          v-model="slot.track"
+          :index="i"
+          :playing="playingIndex === i"
+          :removable="slots.length > 1"
+          @toggle-play="track => togglePlay(i, track)"
+          @remove="removeSlot(slot.id)"
+        />
+      </div>
+
+      <button
+        v-if="canAddMore"
+        type="button"
+        class="btn-add"
+        @click="addSlot"
+      >
+        <span class="btn-add-icon" aria-hidden="true">+</span>
+        Añadir otra canción
+        <span class="btn-add-count" aria-hidden="true">{{ slots.length }}/{{ MAX_SONGS }}</span>
+      </button>
+
+      <p v-if="!hasAnySong" class="hint">
+        Busca y selecciona hasta {{ MAX_SONGS }} canciones para la fiesta.
+      </p>
 
       <FormInput
         v-model="form.dedication"
@@ -25,14 +48,18 @@
         hint="Déjalo vacío si quieres que sea anónimo"
       />
 
-      <button type="submit" class="btn-submit" :disabled="isSubmitting">
+      <button
+        type="submit"
+        class="btn-submit"
+        :disabled="isSubmitting || !hasAnySong"
+      >
         {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
       </button>
 
       <p
         v-if="message"
         class="form-message"
-        :class="{ success: !error, error: error }"
+        :class="{ success: !sendError, error: sendError }"
         role="alert"
         aria-live="assertive"
       >
@@ -43,67 +70,164 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, nextTick, onUnmounted } from 'vue'
 import FormInput from './FormInput.vue'
+import SongPicker from './SongPicker.vue'
+import type { Track } from '../composables/useSongSearch'
+
+const MAX_SONGS = 3
+let nextSlotId = 1
+
+interface Slot {
+  id: number
+  track: Track | null
+}
+
+const slots = ref<Slot[]>([{ id: nextSlotId++, track: null }])
 
 const form = reactive({
-  song: '',
   dedication: '',
   author: ''
 })
 
 const isSubmitting = ref(false)
 const message = ref('')
-const error = ref(false)
+const sendError = ref(false)
+
+const pickerRefs = ref<Array<InstanceType<typeof SongPicker> | null>>([])
+
+const audioEl: HTMLAudioElement | null =
+  typeof Audio !== 'undefined' ? new Audio() : null
+const playingIndex = ref<number | null>(null)
+
+audioEl?.addEventListener('ended', () => {
+  playingIndex.value = null
+})
+
+const hasAnySong = computed(() => slots.value.some(s => s.track !== null))
+const canAddMore = computed(() => {
+  if (slots.value.length >= MAX_SONGS) return false
+  const last = slots.value[slots.value.length - 1]
+  return last?.track !== null
+})
+
+function addSlot() {
+  if (!canAddMore.value) return
+  slots.value.push({ id: nextSlotId++, track: null })
+  nextTick(() => {
+    pickerRefs.value[slots.value.length - 1]?.focus()
+  })
+}
+
+function removeSlot(id: number) {
+  const idx = slots.value.findIndex(s => s.id === id)
+  if (idx < 0) return
+  if (playingIndex.value === idx) stopAudio()
+  else if (playingIndex.value !== null && playingIndex.value > idx) {
+    playingIndex.value -= 1
+  }
+  slots.value.splice(idx, 1)
+  if (slots.value.length === 0) {
+    slots.value.push({ id: nextSlotId++, track: null })
+  }
+}
+
+function togglePlay(index: number, track: Track) {
+  if (!audioEl || !track.previewUrl) return
+  if (playingIndex.value === index) {
+    stopAudio()
+    return
+  }
+  stopAudio()
+  audioEl.src = track.previewUrl
+  audioEl.currentTime = 0
+  audioEl.play().then(() => {
+    playingIndex.value = index
+  }).catch(() => {
+    playingIndex.value = null
+  })
+}
+
+function stopAudio() {
+  if (audioEl) {
+    audioEl.pause()
+    audioEl.currentTime = 0
+  }
+  playingIndex.value = null
+}
 
 async function submitForm() {
-  if (!form.song.trim()) {
-    message.value = 'Por favor, indica la canción que quieres solicitar.'
-    error.value = true
+  const filled = slots.value.filter(s => s.track !== null)
+  if (filled.length === 0) {
+    message.value = 'Por favor, selecciona al menos una canción.'
+    sendError.value = true
     return
   }
 
+  stopAudio()
   isSubmitting.value = true
   message.value = ''
 
+  const timestamp = new Date().toISOString()
+  const author = form.author
+
+  const payloads = filled.map((s, i) => ({
+    Timestamp: timestamp,
+    'Cancion': `${s.track!.name} — ${s.track!.artist}`,
+    'Artista': s.track!.artist,
+    'Album': s.track!.album,
+    'TrackId': s.track!.id,
+    'Dedicatoria': i === 0 ? form.dedication : '',
+    'Quien': author
+  }))
+
   try {
-    const timestamp = new Date().toISOString()
-    const data = {
-      Timestamp: timestamp,
-      'Cancion': form.song,
-      'Dedicatoria': form.dedication,
-      'Quien': form.author
-    }
-
-    const response = await fetch(import.meta.env.VITE_SONG_SHEET_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': import.meta.env.VITE_SONG_API_KEY
-      },
-      body: JSON.stringify(data)
-    })
-
-    if (response.ok) {
-      message.value = '¡Gracias! Tu canción ha sido solicitada.'
-      error.value = false
+    const results = await Promise.allSettled(
+      payloads.map(data =>
+        fetch(import.meta.env.VITE_SONG_SHEET_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Api-Key': import.meta.env.VITE_SONG_API_KEY
+          },
+          body: JSON.stringify(data)
+        }).then(r => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        })
+      )
+    )
+    const okCount = results.filter(r => r.status === 'fulfilled').length
+    if (okCount === payloads.length) {
+      message.value = filled.length === 1
+        ? '¡Gracias! Tu canción ha sido solicitada.'
+        : `¡Gracias! Tus ${filled.length} canciones han sido solicitadas.`
+      sendError.value = false
       resetForm()
+    } else if (okCount === 0) {
+      throw new Error('all failed')
     } else {
-      throw new Error('Error al enviar')
+      message.value = `Se enviaron ${okCount} de ${payloads.length} canciones. Inténtalo de nuevo si falta alguna.`
+      sendError.value = true
     }
   } catch (e) {
-    message.value = 'Por favor, contacta con los novios para solicitar tu canción.'
-    error.value = true
+    message.value = 'Por favor, contacta con los novios para solicitar tus canciones.'
+    sendError.value = true
   } finally {
     isSubmitting.value = false
   }
 }
 
 function resetForm() {
-  form.song = ''
+  slots.value = [{ id: nextSlotId++, track: null }]
   form.dedication = ''
   form.author = ''
+  stopAudio()
 }
+
+onUnmounted(() => {
+  stopAudio()
+  if (audioEl) audioEl.src = ''
+})
 </script>
 
 <style scoped>
@@ -120,6 +244,62 @@ function resetForm() {
   background-color: var(--color-white);
   padding: 24px;
   border-radius: 16px;
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn-add {
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  color: var(--color-primary);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: var(--font-size-small);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.btn-add:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(94, 146, 134, 0.06);
+}
+
+.btn-add-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-primary);
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.btn-add-count {
+  margin-left: auto;
+  font-size: var(--font-size-x-small);
+  color: var(--color-text-muted);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.hint {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+  margin: 0;
+  padding: 0 8px;
 }
 
 .btn-submit {
