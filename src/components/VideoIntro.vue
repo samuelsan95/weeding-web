@@ -7,8 +7,10 @@
     >
       <div class="video-intro__media">
         <video
+          ref="videoRef"
           class="video-intro__video"
           :poster="posterUrl"
+          :src="videoSrc"
           autoplay
           muted
           playsinline
@@ -16,12 +18,7 @@
           @ended="onEnded"
           @canplay="onCanPlay"
           @error="onError"
-        >
-          <source media="(max-width: 768px)" :src="videoMovilWebm" type="video/webm" />
-          <source media="(max-width: 768px)" :src="videoMovilMp4" type="video/mp4" />
-          <source :src="videoDesktopWebm" type="video/webm" />
-          <source :src="videoDesktopMp4" type="video/mp4" />
-        </video>
+        />
         <div class="video-intro__vignette" />
       </div>
 
@@ -62,6 +59,15 @@ import logoUrl from '../assets/logo_white.png'
 const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
 const posterUrl = isMobile ? posterMovilUrl : posterDesktopUrl
 
+function supportsWebm() {
+  if (typeof document === 'undefined') return false
+  const v = document.createElement('video')
+  return Boolean(v.canPlayType && v.canPlayType('video/webm; codecs="vp9,opus"'))
+}
+
+const videoSrc = (isMobile ? (supportsWebm() ? videoMovilWebm : videoMovilMp4)
+                            : (supportsWebm() ? videoDesktopWebm : videoDesktopMp4))
+
 const SESSION_KEY = 'wedding-intro-seen'
 const MAX_DURATION = 6000
 const FADE_OUT_MS = 1200
@@ -73,7 +79,8 @@ const showText = ref(false)
 
 let hideTimer = null
 let safetyTimer = null
-let videoEl = null
+
+const videoRef = ref(null)
 
 function hide() {
   if (!isVisible.value) return
@@ -89,8 +96,7 @@ function onEnded() {
 }
 
 function onCanPlay(e) {
-  videoEl = e.target
-  videoEl.play().catch(() => {
+  e.target.play().catch(() => {
     showText.value = true
   })
   isPlaying.value = true
@@ -115,9 +121,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (hideTimer) clearTimeout(hideTimer)
   if (safetyTimer) clearTimeout(safetyTimer)
-  if (videoEl) {
-    videoEl.pause()
-    videoEl.src = ''
+  if (videoRef.value) {
+    videoRef.value.pause()
+    videoRef.value.removeAttribute('src')
+    videoRef.value.load()
   }
 })
 
