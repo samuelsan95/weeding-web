@@ -1,6 +1,7 @@
 <template>
   <div class="picker" :class="{ 'picker--has-selection': modelValue }">
-    <div v-if="!modelValue" class="picker-search">
+    <!-- Empty: search mode -->
+    <div v-if="!modelValue && !isManual" class="picker-search">
       <div class="picker-header">
         <label :for="inputId" class="picker-label">
           Canción {{ index + 1 }}<span v-if="required"> *</span>
@@ -81,19 +82,65 @@
           <span class="result-duration">{{ formatDuration(track.durationMs) }}</span>
         </li>
       </ul>
+      <button type="button" class="link-manual" @click="enterManual">
+        ¿No la encuentras? Añádela manualmente
+      </button>
     </div>
 
-    <div v-else class="selected" role="status" aria-live="polite">
+    <!-- Empty: manual mode -->
+    <div v-else-if="!modelValue && isManual" class="picker-manual">
+      <label :for="manualTitleId" class="picker-label">
+        Canción {{ index + 1 }}
+      </label>
+      <input
+        :id="manualTitleId"
+        ref="manualTitleEl"
+        v-model="manualTitle"
+        type="text"
+        class="combobox-input"
+        placeholder="Título de la canción *"
+        @keydown.enter="addManual"
+      />
+      <input
+        v-model="manualArtist"
+        type="text"
+        class="combobox-input"
+        placeholder="Artista (opcional)"
+        @keydown.enter="addManual"
+      />
+      <div class="manual-actions">
+        <button
+          type="button"
+          class="btn-manual-add"
+          :disabled="!manualTitle.trim()"
+          @click="addManual"
+        >Añadir</button>
+        <button
+          type="button"
+          class="btn-manual-cancel"
+          @click="cancelManual"
+        >Volver a buscar</button>
+      </div>
+    </div>
+
+    <!-- Selected -->
+    <div v-if="modelValue" class="selected" role="status" aria-live="polite">
       <img
+        v-if="modelValue.artwork"
         :src="modelValue.artwork"
         :alt="`Portada de ${modelValue.album}`"
         class="selected-art"
       />
+      <div
+        v-else
+        class="selected-art selected-art--placeholder"
+        aria-hidden="true"
+      >♪</div>
       <div class="selected-meta">
         <span class="selected-eyebrow">Canción {{ index + 1 }}</span>
         <span class="selected-title">{{ modelValue.name }}</span>
         <span class="selected-sub">
-          {{ modelValue.artist }}<span v-if="modelValue.album"> · {{ modelValue.album }}</span>
+          {{ modelValue.artist || 'Sin artista' }}<span v-if="modelValue.album"> · {{ modelValue.album }}</span>
         </span>
       </div>
       <div class="selected-actions">
@@ -115,7 +162,6 @@
           title="Esta canción no tiene preview disponible"
         >Sin preview</span>
         <button
-          v-if="removable"
           type="button"
           class="btn-remove"
           aria-label="Eliminar canción"
@@ -129,14 +175,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useSongSearch, formatDuration, type Track } from '../composables/useSongSearch'
 
 const props = withDefaults(defineProps<{
   modelValue: Track | null
   index: number
   playing: boolean
-  removable: boolean
   required?: boolean
 }>(), {
   required: true
@@ -149,16 +194,23 @@ const emit = defineEmits<{
 }>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
+const manualTitleEl = ref<HTMLInputElement | null>(null)
+
 const query = ref('')
 const isOpen = ref(false)
 const activeIndex = ref(-1)
 
 const MIN_QUERY_LENGTH = 3
 
+const isManual = ref(false)
+const manualTitle = ref('')
+const manualArtist = ref('')
+
 const { results, isLoading, error, runSearch, clear: clearResults } = useSongSearch(query, { minLength: MIN_QUERY_LENGTH })
 
 const inputId = computed(() => `song-search-${props.index}`)
 const listId = computed(() => `song-results-${props.index}`)
+const manualTitleId = computed(() => `manual-title-${props.index}`)
 const activeId = computed(() =>
   activeIndex.value >= 0 && results.value[activeIndex.value]
     ? `result-${results.value[activeIndex.value].id}`
@@ -186,6 +238,34 @@ function select(track: Track) {
 
 function onTogglePlay() {
   if (props.modelValue) emit('togglePlay', props.modelValue)
+}
+
+function enterManual() {
+  isManual.value = true
+  nextTick(() => manualTitleEl.value?.focus())
+}
+
+function cancelManual() {
+  isManual.value = false
+  manualTitle.value = ''
+  manualArtist.value = ''
+  nextTick(() => inputEl.value?.focus())
+}
+
+function addManual() {
+  const title = manualTitle.value.trim()
+  if (!title) return
+  const artist = manualArtist.value.trim()
+  const track: Track = {
+    id: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: title,
+    artist,
+    album: '',
+    artwork: '',
+    previewUrl: null,
+    durationMs: 0
+  }
+  emit('update:modelValue', track)
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -233,6 +313,15 @@ onBeforeUnmount(() => {
 watch(query, (next) => {
   activeIndex.value = -1
   isOpen.value = next.trim().length > 0
+})
+
+watch(() => props.modelValue, (newVal) => {
+  isManual.value = false
+  manualTitle.value = ''
+  manualArtist.value = ''
+  if (newVal === null) {
+    nextTick(() => inputEl.value?.focus())
+  }
 })
 
 defineExpose({
@@ -301,6 +390,76 @@ defineExpose({
 .combobox-clear:hover {
   background-color: var(--color-border);
   color: var(--color-text);
+}
+
+.link-manual {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  margin-top: 2px;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-x-small);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.link-manual:hover {
+  color: var(--color-primary);
+}
+
+.picker-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.manual-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 2px;
+}
+
+.btn-manual-add {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn-manual-add:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-manual-add:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-manual-cancel {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-x-small);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.btn-manual-cancel:hover {
+  color: var(--color-primary);
 }
 
 .results {
@@ -420,6 +579,16 @@ defineExpose({
   box-shadow: 0 2px 8px rgba(74, 74, 74, 0.15);
 }
 
+.selected-art--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
 .selected-meta {
   display: flex;
   flex-direction: column;
@@ -483,6 +652,14 @@ defineExpose({
   background-color: var(--color-secondary);
 }
 
+.no-preview {
+  font-size: var(--font-size-x-small);
+  color: var(--color-text-muted);
+  padding: 0 8px;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+
 .btn-remove {
   width: 32px;
   height: 32px;
@@ -494,14 +671,6 @@ defineExpose({
   border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.no-preview {
-  font-size: var(--font-size-x-small);
-  color: var(--color-text-muted);
-  padding: 0 8px;
-  white-space: nowrap;
-  letter-spacing: 0.05em;
 }
 
 .btn-remove:hover {

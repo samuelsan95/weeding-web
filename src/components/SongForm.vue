@@ -13,7 +13,6 @@
           v-model="slot.track"
           :index="i"
           :playing="playingIndex === i"
-          :removable="slots.length > 1"
           @toggle-play="track => togglePlay(i, track)"
           @remove="removeSlot(slot.id)"
         />
@@ -277,12 +276,12 @@ onUnmounted(() => {
 .btn-add-icon {
   width: 22px;
   height: 22px;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  align-items: end;
   justify-content: center;
   border: 1px solid var(--color-primary);
   border-radius: 50%;
-  font-size: 1rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
