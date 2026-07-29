@@ -37,5 +37,4 @@ function injectAssetUrls() {
 
 export default defineConfig({
   plugins: [injectAssetUrls(), vue()],
-  base: './',
 })

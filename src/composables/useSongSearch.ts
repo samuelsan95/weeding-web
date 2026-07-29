@@ -19,21 +19,20 @@ interface ITunesTrack {
   previewUrl: string | null
   trackTimeMillis: number | null
 }
-
 interface ITunesResponse {
   resultCount: number
   results: ITunesTrack[]
 }
 
 function mapTrack(t: ITunesTrack): Track | null {
-  if (!t.previewUrl || !t.trackName || !t.artistName) return null
+  if (!t.trackName || !t.artistName) return null
   return {
     id: String(t.trackId),
     name: t.trackName,
     artist: t.artistName,
     album: t.collectionName ?? '',
     artwork: t.artworkUrl100.replace('100x100bb', '300x300bb'),
-    previewUrl: t.previewUrl,
+    previewUrl: t.previewUrl ?? null,
     durationMs: t.trackTimeMillis ?? 0
   }
 }
@@ -52,6 +51,7 @@ export function useSongSearch(
   options: { debounceMs?: number; minLength?: number } = {}
 ) {
   const { debounceMs = 300, minLength = 3 } = options
+  const proxyUrl = import.meta.env.VITE_SONG_PROXY_URL as string | undefined
   const results = ref<Track[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -67,6 +67,11 @@ export function useSongSearch(
   }
 
   async function runSearch(q: string) {
+    if (!proxyUrl) {
+      error.value = 'Servicio de búsqueda no configurado.'
+      results.value = []
+      return
+    }
     if (abortController) abortController.abort()
     const trimmed = q.trim()
     if (trimmed.length < minLength) {
@@ -78,12 +83,13 @@ export function useSongSearch(
     error.value = null
     abortController = new AbortController()
     try {
-      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(trimmed)}&entity=song&limit=8&media=music`
+      const url = `${proxyUrl}?q=${encodeURIComponent(trimmed)}&limit=8`
       const res = await fetch(url, { signal: abortController.signal })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data: ITunesResponse = await res.json()
       if (lastRequestedQuery !== trimmed) return
-      results.value = data.results.map(mapTrack).filter((t): t is Track => t !== null)
+      const items = data.results ?? []
+      results.value = items.map(mapTrack).filter((t): t is Track => t !== null)
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') return
       if (lastRequestedQuery !== trimmed) return

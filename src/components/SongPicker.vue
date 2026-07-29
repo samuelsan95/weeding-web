@@ -109,6 +109,11 @@
           <span v-if="playing" aria-hidden="true">❚❚</span>
           <span v-else aria-hidden="true">▶</span>
         </button>
+        <span
+          v-else
+          class="no-preview"
+          title="Esta canción no tiene preview disponible"
+        >Sin preview</span>
         <button
           v-if="removable"
           type="button"
@@ -126,8 +131,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useSongSearch, formatDuration, type Track } from '../composables/useSongSearch'
-
-let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 const props = withDefaults(defineProps<{
   modelValue: Track | null
@@ -225,7 +228,6 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   document.removeEventListener('mousedown', onDocumentMouseDown, true)
-  if (debounceTimer) clearTimeout(debounceTimer)
 })
 
 watch(query, (next) => {
@@ -492,6 +494,14 @@ defineExpose({
   border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.no-preview {
+  font-size: var(--font-size-x-small);
+  color: var(--color-text-muted);
+  padding: 0 8px;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
 }
 
 .btn-remove:hover {
