@@ -186,10 +186,9 @@ async function submitForm() {
         fetch(import.meta.env.VITE_SONG_SHEET_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'X-Api-Key': import.meta.env.VITE_SONG_API_KEY
+            'Content-Type': 'text/plain;charset=utf-8'
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify({ ...data, token: import.meta.env.VITE_SONG_TOKEN })
         }).then(r => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`)
         })

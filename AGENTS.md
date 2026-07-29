@@ -18,10 +18,10 @@ All env vars are set in the **Vercel project** (*Settings → Environment Variab
 
 | Variable | Type | Used in |
 |---|---|---|
-| `VITE_CONFIRMATION_SHEET_URL` | var | `ConfirmationForm.vue` - sheet.best endpoint |
-| `VITE_CONFIRMATION_API_KEY` | secret | `ConfirmationForm.vue` |
-| `VITE_SONG_SHEET_URL` | var | `SongForm.vue` - sheet.best endpoint |
-| `VITE_SONG_API_KEY` | secret | `SongForm.vue` |
+| `VITE_CONFIRMATION_SHEET_URL` | var | `ConfirmationForm.vue` - Google Apps Script Web App `/exec` URL (confirmations sheet) |
+| `VITE_CONFIRMATION_TOKEN` | secret | `ConfirmationForm.vue` - token validated by the Apps Script `doPost` |
+| `VITE_SONG_SHEET_URL` | var | `SongForm.vue` - Google Apps Script Web App `/exec` URL (songs sheet) |
+| `VITE_SONG_TOKEN` | secret | `SongForm.vue` - token validated by the Apps Script `doPost` |
 | `VITE_SONG_PROXY_URL` | var | `useSongSearch.ts` - URL of the `/api/search` function on the same Vercel project (e.g. `https://wedding-app.vercel.app/api/search`) |
 
 Forms will fail silently without them.

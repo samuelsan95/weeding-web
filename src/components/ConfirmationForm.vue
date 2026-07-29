@@ -117,10 +117,9 @@ const submitForm = async () => {
     const response = await fetch(import.meta.env.VITE_CONFIRMATION_SHEET_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': import.meta.env.VITE_CONFIRMATION_API_KEY
+        'Content-Type': 'text/plain;charset=utf-8'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ ...data, token: import.meta.env.VITE_CONFIRMATION_TOKEN })
     })
 
     if (response.ok) {
