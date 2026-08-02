@@ -21,9 +21,14 @@
         @click="handleClick(index)"
       >
         <img
-          :src="photo.src"
+          :srcset="photo.thumb.srcset"
+          :sizes="photo.thumb.sizes"
+          :src="photo.thumb.src"
+          :width="THUMB_WIDTH"
+          :height="THUMB_HEIGHT"
           :alt="index === currentIndex ? photo.alt : ''"
-          loading="lazy"
+          :fetchpriority="index === currentIndex ? 'high' : 'auto'"
+          :loading="index === currentIndex ? 'eager' : 'lazy'"
           decoding="async"
         />
       </button>
@@ -60,6 +65,9 @@
 import { ref, computed } from 'vue'
 import { photos } from '../data/wedding.js'
 import Lightbox from './Lightbox.vue'
+
+const THUMB_WIDTH = 1200
+const THUMB_HEIGHT = 800
 
 const currentIndex = ref(0)
 const lightboxOpen = ref(false)
@@ -134,11 +142,9 @@ function onTouchEnd() {
 .peek-carousel {
   position: relative;
   width: 100%;
-  height: 60vh;
-  max-height: 500px;
-  min-height: 320px;
-  margin: 0 auto;
   max-width: 1200px;
+  margin: 0 auto;
+  aspect-ratio: 3 / 2;
 }
 
 .peek-slide {
@@ -244,10 +250,6 @@ function onTouchEnd() {
 }
 
 @media (max-width: 768px) {
-  .peek-carousel {
-    height: 50vh;
-    min-height: 280px;
-  }
   .peek-prev {
     right: 92%;
     width: 22%;

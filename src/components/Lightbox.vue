@@ -33,8 +33,13 @@
       <figure class="lightbox-content" @click.stop>
         <img
           :key="currentPhoto.id"
-          :src="currentPhoto.src"
+          :srcset="currentPhoto.full.srcset"
+          :sizes="currentPhoto.full.sizes"
+          :src="currentPhoto.full.src"
+          :width="LIGHTBOX_WIDTH"
+          :height="LIGHTBOX_HEIGHT"
           :alt="currentPhoto.alt"
+          decoding="async"
         />
         <figcaption class="lightbox-caption">
           <span>{{ currentPhoto.alt }}</span>
@@ -56,10 +61,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+
+const LIGHTBOX_WIDTH = 1600
+const LIGHTBOX_HEIGHT = 1200
+
+type Photo = {
+  id: number
+  alt: string
+  thumb: { srcset: string; sizes: string; src: string }
+  full: { srcset: string; sizes: string; src: string }
+}
 
 const props = defineProps<{
-  photos: { id: number; src: string; alt: string }[]
+  photos: Photo[]
   initialIndex: number
 }>()
 
@@ -84,6 +99,22 @@ function prev() {
 function next() {
   currentIndex.value =
     currentIndex.value === props.photos.length - 1 ? 0 : currentIndex.value + 1
+}
+
+function preload(index: number) {
+  const photo = props.photos[index]
+  if (!photo) return
+  const img = new Image()
+  img.decoding = 'async'
+  img.src = photo.full.src
+}
+
+function preloadAdjacent() {
+  if (props.photos.length < 2) return
+  const prevIdx = currentIndex.value === 0 ? props.photos.length - 1 : currentIndex.value - 1
+  const nextIdx = currentIndex.value === props.photos.length - 1 ? 0 : currentIndex.value + 1
+  preload(prevIdx)
+  preload(nextIdx)
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -119,9 +150,14 @@ function onTouchEnd() {
   }
 }
 
+watch(currentIndex, () => {
+  preloadAdjacent()
+})
+
 onMounted(() => {
   document.body.style.overflow = 'hidden'
   document.addEventListener('keydown', handleKeydown)
+  preloadAdjacent()
   nextTick(() => closeBtn.value?.focus())
 })
 
@@ -160,6 +196,7 @@ onBeforeUnmount(() => {
 }
 
 .lightbox-content img {
+  display: block;
   max-width: 100%;
   max-height: 75vh;
   object-fit: contain;

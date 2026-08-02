@@ -25,8 +25,14 @@ function injectAssetUrls() {
         fileName: 'favicon.png',
         source: readFileSync(logoId)
       })
+      const robotsRefId = this.emitFile({
+        type: 'asset',
+        fileName: 'robots.txt',
+        source: 'User-agent: *\nDisallow: /\n'
+      })
       const ogName = this.getFileName(ogRefId)
       const logoName = this.getFileName(logoRefId)
+      this.getFileName(robotsRefId)
       const prefix = base.endsWith('/') ? base : base + '/'
       return html
         .replaceAll('__OG_IMAGE__', `${prefix}${ogName}`)

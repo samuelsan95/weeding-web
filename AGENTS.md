@@ -23,6 +23,7 @@ All env vars are set in the **Vercel project** (*Settings → Environment Variab
 | `VITE_SONG_SHEET_URL` | var | `SongForm.vue` - Google Apps Script Web App `/exec` URL (songs sheet) |
 | `VITE_SONG_TOKEN` | secret | `SongForm.vue` - token validated by the Apps Script `doPost` |
 | `VITE_SONG_PROXY_URL` | var | `useSongSearch.ts` - URL of the `/api/search` function on the same Vercel project (e.g. `https://wedding-app.vercel.app/api/search`) |
+| `VITE_CLOUDINARY_CLOUD_NAME` | var | `wedding.js` - Cloudinary cloud name for the photos gallery (free tier at cloudinary.com) |
 
 Forms will fail silently without them.
 
@@ -39,10 +40,32 @@ Push to `main` triggers a Vercel build automatically:
 - `src/components/` - 11 Vue SFCs (all page sections + shared FormInput)
 - `src/composables/useFootprintAnimation.ts` - Canvas-based scroll animation (TypeScript)
 - `src/composables/useSongSearch.ts` - Debounced song autocomplete via iTunes Search API (proxied through the Vercel function at `/api/search`, see below)
-- `src/data/wedding.js` - Single source of truth: date (2027-06-26), schedule, location, photos
+- `src/data/wedding.js` - Single source of truth: date (2027-06-26), schedule, location, photos (Cloudinary URLs)
 - `src/style.css` - Global CSS with CSS custom properties (`--color-primary`, `--color-background`, `--color-white`)
 - `api/search.js` - Vercel serverless function (iTunes Search CORS proxy)
-- `public/` - Static assets served as-is
+- `public/` - Static assets served as-is (gitignored; populated by Vite plugin at build time)
+
+## Photos Gallery (`src/components/PhotosGallery.vue`)
+
+Photos are served from **Cloudinary** (free tier, ~25GB bandwidth/month). Set `VITE_CLOUDINARY_CLOUD_NAME` to your cloud name (visible in the Cloudinary dashboard URL). For each photo, the app requests on-the-fly variants from Cloudinary:
+
+- **Thumb** (3:2 crop, used in the carousel): `c_fill,q_auto,f_auto` at 600w and 1200w
+- **Lightbox** (preserve aspect ratio, used in the modal): `c_limit,q_auto,f_auto` at 1600w and 2400w
+
+The `f_auto` flag tells Cloudinary to serve AVIF/WebP/JPEG based on the visitor's browser. The components use `<img srcset>` with `sizes` for responsive selection (mobile → 600w, desktop → 1200w).
+
+**Upload workflow**:
+1. Create a Cloudinary account at cloudinary.com
+2. Upload the wedding photos with public IDs `boda-1`, `boda-2`, ..., `boda-10` (or update the `publicId` argument in `wedding.js`)
+3. Set `VITE_CLOUDINARY_CLOUD_NAME` in Vercel (and `.env` for local dev)
+4. Update the `alt` text in `wedding.js` for each photo
+
+**Why Cloudinary**:
+- Free tier is more than enough for a wedding (a few hundred visitors × a few minutes of browsing)
+- On-the-fly transforms mean we ship no image assets in the repo
+- `f_auto` handles WebP/AVIF negotiation server-side via the `Accept` header
+- Global CDN, fast everywhere
+- If the free tier is exceeded, costs are negligible (~$0.005/GB)
 
 ## Song Form (`src/components/SongForm.vue`)
 
