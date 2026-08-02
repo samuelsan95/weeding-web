@@ -155,6 +155,11 @@ watch(currentIndex, () => {
 })
 
 onMounted(() => {
+  const scrollY = window.scrollY
+  document.body.style.position = 'fixed'
+  document.body.style.top = `-${scrollY}px`
+  document.body.style.left = '0'
+  document.body.style.right = '0'
   document.body.style.overflow = 'hidden'
   document.addEventListener('keydown', handleKeydown)
   preloadAdjacent()
@@ -162,7 +167,13 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  const scrollY = parseInt(document.body.style.top || '0', 10) * -1
+  document.body.style.position = ''
+  document.body.style.top = ''
+  document.body.style.left = ''
+  document.body.style.right = ''
   document.body.style.overflow = ''
+  window.scrollTo({ top: scrollY, left: 0, behavior: 'instant' as ScrollBehavior })
   document.removeEventListener('keydown', handleKeydown)
 })
 </script>
