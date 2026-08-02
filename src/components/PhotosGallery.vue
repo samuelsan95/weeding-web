@@ -250,6 +250,11 @@ function onTouchEnd() {
 }
 
 @media (max-width: 768px) {
+  .peek-carousel {
+    aspect-ratio: auto;
+    height: 50vh;
+    min-height: 280px;
+  }
   .peek-prev {
     right: 92%;
     width: 22%;
