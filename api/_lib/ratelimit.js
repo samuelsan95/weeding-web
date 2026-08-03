@@ -52,3 +52,25 @@ export function checkRate(req) {
   buckets.set(key, recent)
   return { ok: true }
 }
+
+const LOOSE_WINDOW_MS = 60 * 1000
+const LOOSE_MAX_PER_WINDOW = 30
+
+export function checkRateLoose(req) {
+  const ip = getClientIp(req)
+  const key = hashIp(ip)
+  const now = Date.now()
+
+  const arr = buckets.get(key) || []
+  const recent = arr.filter((t) => now - t < LOOSE_WINDOW_MS)
+
+  if (recent.length >= LOOSE_MAX_PER_WINDOW) {
+    const oldest = recent[0]
+    const retryAfter = Math.ceil((LOOSE_WINDOW_MS - (now - oldest)) / 1000)
+    return { ok: false, retryAfter, tier: 'window' }
+  }
+
+  recent.push(now)
+  buckets.set(key, recent)
+  return { ok: true }
+}

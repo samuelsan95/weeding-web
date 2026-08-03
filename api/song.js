@@ -22,10 +22,10 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Origin not allowed' })
   }
 
-  const sheetUrl = process.env.SONG_SHEET_URL
-  const token = process.env.SONG_SERVER_TOKEN
+  const sheetUrl = process.env.VITE_SONG_SHEET_URL
+  const token = process.env.VITE_SONG_SERVER_TOKEN
   if (!sheetUrl || !token) {
-    console.error('song: missing SONG_SHEET_URL or SONG_SERVER_TOKEN')
+    console.error('song: missing VITE_SONG_SHEET_URL or VITE_SONG_SERVER_TOKEN')
     return res.status(500).json({ error: 'Server misconfigured' })
   }
 

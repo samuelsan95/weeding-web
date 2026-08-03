@@ -24,15 +24,17 @@ All env vars are set in the **Vercel project** (*Settings → Environment Variab
 | `VITE_SONG_PROXY_URL` | var | `useSongSearch.ts` - URL of the `/api/search` function on the same Vercel project (e.g. `https://ireneysamuel.xyz/api/search`) |
 | `VITE_CLOUDINARY_CLOUD_NAME` | var | `wedding.js` - Cloudinary cloud name for the photos gallery (free tier at cloudinary.com) |
 
-### Server (no prefix → only readable by `api/*` functions)
+### Server (read by `api/*` functions via `process.env`)
 
 | Variable | Type | Used in |
 |---|---|---|
-| `CONFIRMATION_SHEET_URL` | secret | `api/confirm.js` - Google Apps Script `/exec` URL for confirmations |
-| `CONFIRMATION_SERVER_TOKEN` | secret | `api/confirm.js` - token validated by the Apps Script `doPost` (rotate to invalidate old tokens) |
-| `SONG_SHEET_URL` | secret | `api/song.js` - Google Apps Script `/exec` URL for songs |
-| `SONG_SERVER_TOKEN` | secret | `api/song.js` - token validated by the Apps Script `doPost` |
+| `VITE_CONFIRMATION_SHEET_URL` | secret | `api/confirm.js` - Google Apps Script `/exec` URL for confirmations |
+| `VITE_CONFIRMATION_SERVER_TOKEN` | secret | `api/confirm.js` - token validated by the Apps Script `doPost` (rotate to invalidate old tokens) |
+| `VITE_SONG_SHEET_URL` | secret | `api/song.js` - Google Apps Script `/exec` URL for songs |
+| `VITE_SONG_SERVER_TOKEN` | secret | `api/song.js` - token validated by the Apps Script `doPost` |
 | `ALLOWED_ORIGIN` | var | `api/_lib/cors.js` - production origin for CORS allow-list (e.g. `https://ireneysamuel.xyz`) |
+
+> The `VITE_` prefix on the four form vars is a naming choice, **not** a security mechanism. Only the client bundle reads `VITE_*` vars via `import.meta.env`; the serverless functions read them via `process.env`, so a `VITE_` server-only var is never sent to the browser. `ALLOWED_ORIGIN` has no prefix because no client code reads it.
 
 Forms will fail silently without the server-side env vars. The browser **never** sees the sheet URLs or the server tokens.
 

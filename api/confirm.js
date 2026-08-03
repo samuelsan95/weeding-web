@@ -22,10 +22,10 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Origin not allowed' })
   }
 
-  const sheetUrl = process.env.CONFIRMATION_SHEET_URL
-  const token = process.env.CONFIRMATION_SERVER_TOKEN
+  const sheetUrl = process.env.VITE_CONFIRMATION_SHEET_URL
+  const token = process.env.VITE_CONFIRMATION_SERVER_TOKEN
   if (!sheetUrl || !token) {
-    console.error('confirm: missing CONFIRMATION_SHEET_URL or CONFIRMATION_SERVER_TOKEN')
+    console.error('confirm: missing VITE_CONFIRMATION_SHEET_URL or VITE_CONFIRMATION_SERVER_TOKEN')
     return res.status(500).json({ error: 'Server misconfigured' })
   }
 
