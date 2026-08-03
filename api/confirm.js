@@ -23,9 +23,9 @@ export default async function handler(req, res) {
   }
 
   const sheetUrl = process.env.VITE_CONFIRMATION_SHEET_URL
-  const token = process.env.VITE_CONFIRMATION_SERVER_TOKEN
+  const token = process.env.VITE_CONFIRMATION_TOKEN
   if (!sheetUrl || !token) {
-    console.error('confirm: missing VITE_CONFIRMATION_SHEET_URL or VITE_CONFIRMATION_SERVER_TOKEN')
+    console.error('confirm: missing VITE_CONFIRMATION_SHEET_URL or VITE_CONFIRMATION_TOKEN')
     return res.status(500).json({ error: 'Server misconfigured' })
   }
 

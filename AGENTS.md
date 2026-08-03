@@ -29,9 +29,9 @@ All env vars are set in the **Vercel project** (*Settings → Environment Variab
 | Variable | Type | Used in |
 |---|---|---|
 | `VITE_CONFIRMATION_SHEET_URL` | secret | `api/confirm.js` - Google Apps Script `/exec` URL for confirmations |
-| `VITE_CONFIRMATION_SERVER_TOKEN` | secret | `api/confirm.js` - token validated by the Apps Script `doPost` (rotate to invalidate old tokens) |
+| `VITE_CONFIRMATION_TOKEN` | secret | `api/confirm.js` - token validated by the Apps Script `doPost` (rotate to invalidate old tokens) |
 | `VITE_SONG_SHEET_URL` | secret | `api/song.js` - Google Apps Script `/exec` URL for songs |
-| `VITE_SONG_SERVER_TOKEN` | secret | `api/song.js` - token validated by the Apps Script `doPost` |
+| `VITE_SONG_TOKEN` | secret | `api/song.js` - token validated by the Apps Script `doPost` |
 | `ALLOWED_ORIGIN` | var | `api/_lib/cors.js` - production origin for CORS allow-list (e.g. `https://ireneysamuel.xyz`) |
 
 > The `VITE_` prefix on the four form vars is a naming choice, **not** a security mechanism. Only the client bundle reads `VITE_*` vars via `import.meta.env`; the serverless functions read them via `process.env`, so a `VITE_` server-only var is never sent to the browser. `ALLOWED_ORIGIN` has no prefix because no client code reads it.
@@ -89,7 +89,7 @@ honeypot, maxlength, 5s submit debounce, soft localStorage gate (confirmation on
 - **Payload validation**: types, lengths, allowed values; rejects chars de control.
 - **Rate-limit in-memory per IP** (hashed with SHA-256): 1 req / 30s, 5 req / 10 min. State resets on cold start; acceptable for ~100 guests.
 
-**Token rotation**: when you rotate `CONFIRMATION_SERVER_TOKEN` or `SONG_SERVER_TOKEN`, update both the Vercel env var **and** the expected value in the corresponding Apps Script `doPost`. The old token stops working as soon as you redeploy the Apps Script.
+**Token rotation**: when you rotate `VITE_CONFIRMATION_TOKEN` or `VITE_SONG_TOKEN`, update both the Vercel env var **and** the expected value in the corresponding Apps Script `doPost`. The old token stops working as soon as you redeploy the Apps Script.
 
 ## Photos Gallery (`src/components/PhotosGallery.vue`)
 

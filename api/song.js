@@ -23,9 +23,9 @@ export default async function handler(req, res) {
   }
 
   const sheetUrl = process.env.VITE_SONG_SHEET_URL
-  const token = process.env.VITE_SONG_SERVER_TOKEN
+  const token = process.env.VITE_SONG_TOKEN
   if (!sheetUrl || !token) {
-    console.error('song: missing VITE_SONG_SHEET_URL or VITE_SONG_SERVER_TOKEN')
+    console.error('song: missing VITE_SONG_SHEET_URL or VITE_SONG_TOKEN')
     return res.status(500).json({ error: 'Server misconfigured' })
   }
 
