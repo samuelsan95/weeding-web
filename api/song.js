@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Validation failed', details: errors })
   }
 
-  const rate = checkRate(req)
+  const rate = checkRate(req, { cooldownMs: 0 })
   if (!rate.ok) {
     res.setHeader('Retry-After', String(rate.retryAfter))
     return res.status(429).json({ error: 'Too many requests', retryAfter: rate.retryAfter })

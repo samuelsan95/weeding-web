@@ -137,7 +137,7 @@ Set `VITE_SONG_PROXY_URL` to the function URL: `https://<your-project>.vercel.ap
 
 `vercel.json` sets a baseline for every response:
 
-- `Content-Security-Policy` — `default-src 'self'`, image sources allow Cloudinary, styles allow Google Fonts + `'unsafe-inline'` (Vue scoped styles), no frames, no objects.
+- `Content-Security-Policy` — `default-src 'self'`, image sources allow Cloudinary + iTunes artwork (`*.mzstatic.com`), audio previews from the same iTunes CDN, styles allow Google Fonts + `'unsafe-inline'` (Vue scoped styles), no frames, no objects.
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()`

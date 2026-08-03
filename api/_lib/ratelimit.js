@@ -8,9 +8,9 @@
 
 import { createHash } from 'node:crypto'
 
-const COOLDOWN_MS = 30 * 1000
-const WINDOW_MS = 10 * 60 * 1000
-const MAX_PER_WINDOW = 5
+const DEFAULT_COOLDOWN_MS = 30 * 1000
+const DEFAULT_WINDOW_MS = 10 * 60 * 1000
+const DEFAULT_MAX_PER_WINDOW = 5
 const SALT = process.env.RATELIMIT_SALT || 'wedding-static-salt'
 
 const buckets = new Map()
@@ -27,24 +27,28 @@ function getClientIp(req) {
   return req.socket?.remoteAddress || 'unknown'
 }
 
-export function checkRate(req) {
+export function checkRate(req, options = {}) {
+  const cooldownMs = options.cooldownMs ?? DEFAULT_COOLDOWN_MS
+  const windowMs = options.windowMs ?? DEFAULT_WINDOW_MS
+  const maxPerWindow = options.maxPerWindow ?? DEFAULT_MAX_PER_WINDOW
+
   const ip = getClientIp(req)
   const key = hashIp(ip)
   const now = Date.now()
 
   const arr = buckets.get(key) || []
-  const recent = arr.filter((t) => now - t < WINDOW_MS)
+  const recent = arr.filter((t) => now - t < windowMs)
 
-  if (recent.length > 0 && now - recent[recent.length - 1] < COOLDOWN_MS) {
+  if (cooldownMs > 0 && recent.length > 0 && now - recent[recent.length - 1] < cooldownMs) {
     const retryAfter = Math.ceil(
-      (COOLDOWN_MS - (now - recent[recent.length - 1])) / 1000
+      (cooldownMs - (now - recent[recent.length - 1])) / 1000
     )
     return { ok: false, retryAfter, tier: 'cooldown' }
   }
 
-  if (recent.length >= MAX_PER_WINDOW) {
+  if (recent.length >= maxPerWindow) {
     const oldest = recent[0]
-    const retryAfter = Math.ceil((WINDOW_MS - (now - oldest)) / 1000)
+    const retryAfter = Math.ceil((windowMs - (now - oldest)) / 1000)
     return { ok: false, retryAfter, tier: 'window' }
   }
 
