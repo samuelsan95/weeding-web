@@ -46,7 +46,7 @@
   </Transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import videoDesktopWebm from '../assets/intro/video_desktop.webm'
 import videoDesktopMp4 from '../assets/intro/video_desktop.mp4'
@@ -77,10 +77,10 @@ const isFadingOut = ref(false)
 const isPlaying = ref(false)
 const showText = ref(false)
 
-let hideTimer = null
-let safetyTimer = null
+let hideTimer: ReturnType<typeof setTimeout> | null = null
+let safetyTimer: ReturnType<typeof setTimeout> | null = null
 
-const videoRef = ref(null)
+const videoRef = ref<HTMLVideoElement | null>(null)
 
 function hide() {
   if (!isVisible.value) return
@@ -95,8 +95,8 @@ function onEnded() {
   hide()
 }
 
-function onCanPlay(e) {
-  e.target.play().catch(() => {
+function onCanPlay(e: Event) {
+  ;(e.target as HTMLVideoElement).play().catch(() => {
     showText.value = true
   })
   isPlaying.value = true
@@ -128,7 +128,7 @@ onBeforeUnmount(() => {
   }
 })
 
-function handleSkip(e) {
+function handleSkip(e: MouseEvent) {
   e.stopPropagation()
   hide()
 }
