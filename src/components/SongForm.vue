@@ -5,6 +5,16 @@
     <div class="section-divider"></div>
 
     <form class="form" @submit.prevent="submitForm" novalidate>
+      <input
+        type="text"
+        name="company"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+        class="honeypot"
+        v-model="honeypot"
+      />
+
       <div class="slots">
         <SongPicker
           v-for="(slot, i) in slots"
@@ -37,6 +47,7 @@
         v-model="form.dedication"
         type="textarea"
         label="Dedicatoria para los novios"
+        :maxlength="500"
         hint="Escribe una dedicatoria especial para los novios (opcional)"
       />
 
@@ -44,15 +55,16 @@
         v-model="form.author"
         label="¿Quién lo escribe?"
         autocomplete="name"
+        :maxlength="100"
         hint="Déjalo vacío si quieres que sea anónimo"
       />
 
       <button
         type="submit"
         class="btn-submit"
-        :disabled="isSubmitting || !hasAnySong"
+        :disabled="!canSubmit"
       >
-        {{ isSubmitting ? 'Enviando...' : 'Enviar' }}
+        {{ submitLabel }}
       </button>
 
       <p
@@ -69,12 +81,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, nextTick, onUnmounted } from 'vue'
+import { ref, reactive, computed, nextTick, onBeforeUnmount, onUnmounted } from 'vue'
 import FormInput from './FormInput.vue'
 import SongPicker from './SongPicker.vue'
 import type { Track } from '../composables/useSongSearch'
 
 const MAX_SONGS = 3
+const COOLDOWN_MS = 5000
 let nextSlotId = 1
 
 interface Slot {
@@ -89,9 +102,13 @@ const form = reactive({
   author: ''
 })
 
+const honeypot = ref('')
 const isSubmitting = ref(false)
+const isCoolingDown = ref(false)
 const message = ref('')
 const sendError = ref(false)
+
+let cooldownTimer: ReturnType<typeof setTimeout> | null = null
 
 const pickerRefs = ref<Array<InstanceType<typeof SongPicker> | null>>([])
 
@@ -109,6 +126,22 @@ const canAddMore = computed(() => {
   const last = slots.value[slots.value.length - 1]
   return last?.track !== null
 })
+const canSubmit = computed(
+  () => !isSubmitting.value && !isCoolingDown.value && hasAnySong.value
+)
+const submitLabel = computed(() => {
+  if (isSubmitting.value) return 'Enviando...'
+  if (isCoolingDown.value) return 'Espera unos segundos'
+  return 'Enviar'
+})
+
+function startCooldown() {
+  isCoolingDown.value = true
+  if (cooldownTimer) clearTimeout(cooldownTimer)
+  cooldownTimer = setTimeout(() => {
+    isCoolingDown.value = false
+  }, COOLDOWN_MS)
+}
 
 function addSlot() {
   if (!canAddMore.value) return
@@ -156,6 +189,14 @@ function stopAudio() {
 }
 
 async function submitForm() {
+  if (!canSubmit.value) return
+
+  if (honeypot.value.trim().length > 0) {
+    message.value = '¡Gracias! Tus canciones han sido enviadas.'
+    sendError.value = false
+    return
+  }
+
   const filled = slots.value.filter(s => s.track !== null)
   if (filled.length === 0) {
     message.value = 'Por favor, selecciona al menos una canción.'
@@ -165,48 +206,46 @@ async function submitForm() {
 
   stopAudio()
   isSubmitting.value = true
+  startCooldown()
   message.value = ''
-
-  const timestamp = new Date().toISOString()
-  const author = form.author
-
-  const payloads = filled.map((s, i) => ({
-    Timestamp: timestamp,
-    'Cancion': `${s.track!.name} — ${s.track!.artist}`,
-    'Artista': s.track!.artist,
-    'Album': s.track!.album,
-    'TrackId': s.track!.id,
-    'Dedicatoria': i === 0 ? form.dedication : '',
-    'Quien': author
-  }))
+  sendError.value = false
 
   try {
-    const results = await Promise.allSettled(
-      payloads.map(data =>
-        fetch(import.meta.env.VITE_SONG_SHEET_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify({ ...data, token: import.meta.env.VITE_SONG_TOKEN })
-        }).then(r => {
-          if (!r.ok) throw new Error(`HTTP ${r.status}`)
-        })
-      )
-    )
-    const okCount = results.filter(r => r.status === 'fulfilled').length
-    if (okCount === payloads.length) {
-      message.value = filled.length === 1
-        ? '¡Gracias! Tu canción ha sido solicitada.'
-        : `¡Gracias! Tus ${filled.length} canciones han sido solicitadas.`
-      sendError.value = false
-      resetForm()
-    } else if (okCount === 0) {
-      throw new Error('all failed')
-    } else {
-      message.value = `Se enviaron ${okCount} de ${payloads.length} canciones. Inténtalo de nuevo si falta alguna.`
+    const response = await fetch('/api/song', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dedication: form.dedication.trim(),
+        author: form.author.trim(),
+        songs: filled.map(s => ({
+          trackId: s.track!.id,
+          name: s.track!.name.trim(),
+          artist: s.track!.artist.trim(),
+          album: (s.track!.album ?? '').trim()
+        }))
+      })
+    })
+
+    if (response.status === 207) {
+      message.value = `Algunas canciones no pudieron enviarse. Inténtalo de nuevo si falta alguna.`
       sendError.value = true
+      return
     }
+    if (!response.ok) {
+      if (response.status === 429) {
+        message.value = 'Has enviado demasiadas solicitudes. Espera un momento.'
+      } else {
+        message.value = 'Por favor, contacta con los novios para solicitar tus canciones.'
+      }
+      sendError.value = true
+      return
+    }
+
+    message.value = filled.length === 1
+      ? '¡Gracias! Tu canción ha sido solicitada.'
+      : `¡Gracias! Tus ${filled.length} canciones han sido solicitadas.`
+    sendError.value = false
+    resetForm()
   } catch (e) {
     message.value = 'Por favor, contacta con los novios para solicitar tus canciones.'
     sendError.value = true
@@ -221,6 +260,10 @@ function resetForm() {
   form.author = ''
   stopAudio()
 }
+
+onBeforeUnmount(() => {
+  if (cooldownTimer) clearTimeout(cooldownTimer)
+})
 
 onUnmounted(() => {
   stopAudio()
@@ -242,6 +285,17 @@ onUnmounted(() => {
   background-color: var(--color-white);
   padding: 24px;
   border-radius: 16px;
+  position: relative;
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .slots {

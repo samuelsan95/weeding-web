@@ -43,4 +43,7 @@ function injectAssetUrls() {
 
 export default defineConfig({
   plugins: [injectAssetUrls(), vue()],
+  build: {
+    sourcemap: false
+  }
 })

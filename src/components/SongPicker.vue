@@ -99,6 +99,7 @@
         type="text"
         class="combobox-input"
         placeholder="Título de la canción *"
+        maxlength="200"
         @keydown.enter="addManual"
       />
       <input
@@ -106,6 +107,7 @@
         type="text"
         class="combobox-input"
         placeholder="Artista (opcional)"
+        maxlength="200"
         @keydown.enter="addManual"
       />
       <div class="manual-actions">

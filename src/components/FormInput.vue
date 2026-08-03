@@ -7,6 +7,7 @@
       :value="modelValue"
       :placeholder="placeholder"
       :required="required"
+      :maxlength="maxlength"
       :aria-describedby="hintId"
       rows="3"
       @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
@@ -19,6 +20,7 @@
       :placeholder="placeholder"
       :required="required"
       :min="min"
+      :max="max"
       :step="step"
       :aria-describedby="hintId"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -30,6 +32,7 @@
       :value="modelValue"
       :placeholder="placeholder"
       :required="required"
+      :maxlength="maxlength"
       :autocomplete="autocomplete"
       :aria-describedby="hintId"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -50,7 +53,9 @@ const props = withDefaults(defineProps<{
   autocomplete?: string
   hint?: string
   min?: number
+  max?: number
   step?: number
+  maxlength?: number
 }>(), {
   type: 'text',
   placeholder: '',
